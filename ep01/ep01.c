@@ -22,6 +22,11 @@ void* calcula_derivada(void* f){
     return evaluator_derivative_x(f);
 }
 
+int criterioParada(/*x_old, x_new*/){
+
+    return 0;
+}
+
 void leParametros(void **f, double *x, double *epsilon, int *max_iter){
     char func[BUFFER_SIZE];
     scanf("%s", func);
@@ -34,6 +39,7 @@ void leParametros(void **f, double *x, double *epsilon, int *max_iter){
 
 int main(int argc, char **argv)
 {
+    // Parametros
     void *f, *f_der;
     double x_inicial;
     double epsilon;
@@ -47,10 +53,27 @@ int main(int argc, char **argv)
     printf ("f'(x) = %s\n", evaluator_get_string (f_der));
     printf("x_0 = %lf\nepsilon = %lf \nmax_iter = %d \n\n", x_inicial, epsilon, max_iter);
 
-    // printf("  f(%g) = %g\n", x, evaluator_evaluate_x(f, x));
-    // printf("  f'(%g) = %g\n", x, evaluator_evaluate_x(f_der, x));
+    // Saídas
+    int iteracao = 0;
+    double newton_x, newton_crit;
+    double secante_x, secante_crit;
 
-    /* Destroy evaluators.  */
+    // Temporarias
+    double x_old_old = x_inicial;
+    double x_old, x_new;
+    do {
+        // Método de Newton-Raphson
+        x_new = x_old - (evaluator_evaluate_x(f, x_old) / evaluator_evaluate_x(f_der, x_old));
+
+        // Método da secante
+
+        // Calcula erro
+
+        // Imprime resultado parcial
+
+        iteracao++;
+    } while(!criterioParada(/*x_old, x_new*/));
+
     evaluator_destroy(f);
     evaluator_destroy(f_der);
 
