@@ -107,14 +107,14 @@ int main(int argc, char **argv)
         erro_abs = newton_x - secante_x;
         erro_relat = fabs(erro_abs / newton_x);
 
-        Double_t ULT , temp;
-        ULT.d = secante_x;
+        Double_t ULP , temp;
+        ULP.d = secante_x;
         temp.d = newton_x;
-        ULT.i = abs(ULT.i - temp.i) - 1;
-        if(ULT.i < 0) ULT.i = 0;
+        ULP.i = abs(ULP.i - temp.i) - 1;
+        if(ULP.i < 0) ULP.i = 0;
         
         // Imprime resultado parcial
-        printf("%d,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%ld\n", iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat, ULT.i);
+        printf("%d,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%ld\n", iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat, ULP.i);
 
         iteracao++;
     } while(iteracao <= 5);
