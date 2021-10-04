@@ -8,6 +8,18 @@
 /* Size of input buffer.  */
 #define BUFFER_SIZE 256
 
+typedef union
+{
+    int64_t i;
+    double d;
+    struct
+    {   // Bitfields for exploration (64 bits = sign|exponent|mantissa)
+        int64_t mantissa : 52; // primeiros 52 bits (da direita para a esquerda)
+        int64_t exponent : 11;  // próximos 11 bits
+        int64_t sign : 1;      // proximo bit (ou seja, o bit mais a esquerda)
+    } parts;
+} Double_t;
+
 // Função para iniciar uma função
 // Recebe como parametro uma string e retorna um ponteiro para função
 void* inicia_funcao(char* funcao){
@@ -50,9 +62,9 @@ int main(int argc, char **argv)
     
     f_der = calcula_derivada(f);
 
-    printf ("f(x) = %s\n", evaluator_get_string (f));
-    printf ("f'(x) = %s\n", evaluator_get_string (f_der));
-    printf("x_0 = %lf\nepsilon = %lf \nmax_iter = %d \n\n", x_inicial, epsilon, max_iter);
+    // printf ("f(x) = %s\n", evaluator_get_string (f));
+    // printf ("f'(x) = %s\n", evaluator_get_string (f_der));
+    // printf("x_0 = %lf\nepsilon = %lf \nmax_iter = %d \n\n", x_inicial, epsilon, max_iter);
 
     // Saídas
     int iteracao = 1;
@@ -67,7 +79,7 @@ int main(int argc, char **argv)
     secante_crit = 0;
 
     double erro_abs, erro_relat;
-    printf("iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat\n");
+    // printf("iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat\n");
     do {
 
         // Método de Newton-Raphson
@@ -75,6 +87,7 @@ int main(int argc, char **argv)
         double denominado_newton = evaluator_evaluate_x(f_der, newton_x);
         // printf("%1.16e / %1.16e \n", numerador_newton, denominado_newton);
         newton_x = newton_x - (numerador_newton / denominado_newton);
+        newton_crit = fabs(evaluator_evaluate_x(f, newton_x));
 
         // Método da secante
         if(iteracao == 1){
@@ -87,14 +100,21 @@ int main(int argc, char **argv)
             secante_x_ant = secante_x;
             secante_x = secante_x - secante_parcial;
         }
+        secante_crit = fabs(evaluator_evaluate_x(f, secante_x));
 
         // printf("anterior: %1.16e, anterior anterior: %1.16e \n", secante_x, secante_x_ant);
         // Calcula erro
         erro_abs = newton_x - secante_x;
         erro_relat = fabs(erro_abs / newton_x);
+
+        Double_t ULT , temp;
+        ULT.d = secante_x;
+        temp.d = newton_x;
+        ULT.i = abs(ULT.i - temp.i) - 1;
+        if(ULT.i < 0) ULT.i = 0;
         
         // Imprime resultado parcial
-        printf("%d,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,\n", iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat);
+        printf("%d,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%ld\n", iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat, ULT.i);
 
         iteracao++;
     } while(iteracao <= 5);
