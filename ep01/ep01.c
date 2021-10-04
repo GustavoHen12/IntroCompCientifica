@@ -3,6 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include <matheval.h>
+#include <math.h>
 
 /* Size of input buffer.  */
 #define BUFFER_SIZE 256
@@ -70,23 +71,27 @@ int main(int argc, char **argv)
     do {
 
         // Método de Newton-Raphson
-        newton_x = newton_x - (evaluator_evaluate_x(f, newton_x) / evaluator_evaluate_x(f_der, newton_x));
+        double numerador_newton = evaluator_evaluate_x(f, newton_x);
+        double denominado_newton = evaluator_evaluate_x(f_der, newton_x);
+        // printf("%1.16e / %1.16e \n", numerador_newton, denominado_newton);
+        newton_x = newton_x - (numerador_newton / denominado_newton);
 
         // Método da secante
         if(iteracao == 1){
-            secante_x = x_inicial;
-            secante_x_ant = newton_x;
+            secante_x = newton_x;
+            secante_x_ant = x_inicial;
+        } else {
+            double numerador_secante = evaluator_evaluate_x(f, secante_x) * (secante_x - secante_x_ant);
+            double denominador_secante = evaluator_evaluate_x(f, secante_x) - evaluator_evaluate_x(f, secante_x_ant);
+            double secante_parcial = numerador_secante / denominador_secante ;
+            secante_x_ant = secante_x;
+            secante_x = secante_x - secante_parcial;
         }
 
-        double numerador_secante = evaluator_evaluate_x(f, secante_x) * (secante_x - secante_x_ant);
-        double denominador_secante = evaluator_evaluate_x(f, secante_x) - evaluator_evaluate_x(f, secante_x_ant);
-        double secante_parcial = numerador_secante / denominador_secante ;
-        secante_x_ant = secante_x;
-        secante_x = secante_x - secante_parcial;
-
+        // printf("anterior: %1.16e, anterior anterior: %1.16e \n", secante_x, secante_x_ant);
         // Calcula erro
-        erro_abs = secante_x - newton_x;
-        erro_relat = erro_abs / secante_x;
+        erro_abs = newton_x - secante_x;
+        erro_relat = fabs(erro_abs / newton_x);
         
         // Imprime resultado parcial
         printf("%d,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,\n", iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat);
