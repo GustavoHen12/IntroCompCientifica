@@ -54,25 +54,47 @@ int main(int argc, char **argv)
     printf("x_0 = %lf\nepsilon = %lf \nmax_iter = %d \n\n", x_inicial, epsilon, max_iter);
 
     // Saídas
-    int iteracao = 0;
-    double newton_x, newton_crit;
-    double secante_x, secante_crit;
+    int iteracao = 1;
 
     // Temporarias
-    double x_old_old = x_inicial;
-    double x_old, x_new;
+    double newton_x, newton_crit;
+    double secante_x_ant, secante_x, secante_crit;
+
+    newton_x = x_inicial;
+
+    newton_crit = 0;
+    secante_crit = 0;
+
+    double erro_abs, erro_relat;
+    printf("iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat\n");
     do {
+
         // Método de Newton-Raphson
-        x_new = x_old - (evaluator_evaluate_x(f, x_old) / evaluator_evaluate_x(f_der, x_old));
+        newton_x = newton_x - (evaluator_evaluate_x(f, newton_x) / evaluator_evaluate_x(f_der, newton_x));
 
         // Método da secante
+        if(iteracao == 1){
+            secante_x = x_inicial;
+            secante_x_ant = newton_x;
+        }
+
+        double numerador_secante = evaluator_evaluate_x(f, secante_x) * (secante_x - secante_x_ant);
+        double denominador_secante = evaluator_evaluate_x(f, secante_x) - evaluator_evaluate_x(f, secante_x_ant);
+        double secante_parcial = numerador_secante / denominador_secante ;
+        secante_x_ant = secante_x;
+        secante_x = secante_x - secante_parcial;
 
         // Calcula erro
-
+        erro_abs = secante_x - newton_x;
+        erro_relat = erro_abs / secante_x;
+        
         // Imprime resultado parcial
+        printf("%d,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,\n", iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat);
 
         iteracao++;
-    } while(!criterioParada(/*x_old, x_new*/));
+    } while(iteracao <= 5);
+
+    //while(!criterioParada(/*x_old, x_new*/));
 
     evaluator_destroy(f);
     evaluator_destroy(f_der);
