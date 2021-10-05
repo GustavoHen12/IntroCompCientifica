@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     secante_crit = 0;
 
     double erro_abs = 0, erro_relat = 0;
-    printf("iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat\n");
+    printf("iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat, ulp\n");
     printf("%d,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,0\n", iteracao++, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat);
     do {
 
