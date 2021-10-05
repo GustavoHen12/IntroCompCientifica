@@ -4,7 +4,6 @@
 #include <assert.h>
 #include <matheval.h>
 #include <math.h>
-#include <float.h>
 
 /* Size of input buffer.  */
 #define BUFFER_SIZE 256
@@ -37,8 +36,8 @@ void* calcula_derivada(void* f){
 }
 
 // Critério de parada sendo se o erro relativo é menor que o epsilon de double
-int criterioParada(double crit1, double crit2){
-    return (fabs(crit1) < DBL_EPSILON || fabs(crit2) < DBL_EPSILON);
+int criterioParada(double crit1, double crit2, double epsilon){
+    return (fabs(crit1) < epsilon || fabs(crit2) < epsilon);
 }
 
 void leParametros(void **f, double *x, double *epsilon, int *max_iter){
@@ -123,7 +122,7 @@ int main(int argc, char **argv)
         printf("%d,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%ld\n", iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat, ULP.i);
 
         iteracao++;
-    } while(iteracao < max_iter && !criterioParada(newton_crit, secante_crit));
+    } while(iteracao < max_iter && !criterioParada(newton_crit, secante_crit, epsilon));
 
 
     evaluator_destroy(f);
