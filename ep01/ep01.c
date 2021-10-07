@@ -115,8 +115,8 @@ int main(int argc, char **argv)
         if(ULP.i < 0) ULP.i = 0;
 
         // Calculo dos erros relativos
-        secante_crit = fabs((secante_x - secante_x_ant) / secante_x);
-        newton_crit = fabs((newton_x - newton_x_ant) / newton_x);
+        secante_crit = fabs((secante_x - secante_x_ant) / (secante_x != 0 ? secante_x : 1));
+        newton_crit = fabs((newton_x - newton_x_ant) / (newton_x != 0 ? newton_x : 1));
         
         // Imprime resultado parcial
         printf("%d,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%ld\n", iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat, ULP.i);
