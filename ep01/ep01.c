@@ -1,12 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <assert.h>
 #include <matheval.h>
 #include <math.h>
 
-/* Size of input buffer.  */
-#define BUFFER_SIZE 256
+#define INPUT_SIZE 256
 
 typedef union
 {
@@ -24,8 +21,6 @@ typedef union
 // Recebe como parametro uma string e retorna um ponteiro para função
 void* inicia_funcao(char* funcao){
     void* f = evaluator_create(funcao);
-    assert(f);
-
     return f;
 }
 
@@ -41,8 +36,8 @@ int criterioParada(double crit1, double crit2, double epsilon){
 }
 
 void leParametros(void **f, double *x, double *epsilon, int *max_iter){
-    char func[BUFFER_SIZE];
-    scanf("%s", func);
+    char func[INPUT_SIZE];
+    scanf("%[^\t\n]s", func);
     *f = inicia_funcao(func);
 
     scanf("%lf", x);
@@ -62,23 +57,16 @@ int main(int argc, char **argv)
     
     f_der = calcula_derivada(f);
 
-    // printf ("f(x) = %s\n", evaluator_get_string (f));
-    // printf ("f'(x) = %s\n", evaluator_get_string (f_der));
-    // printf("x_0 = %lf\nepsilon = %lf \nmax_iter = %d \n\n", x_inicial, epsilon, max_iter);
-
-    // Saídas
     int iteracao = 0;
-
-    // Temporarias
     double newton_x, newton_crit, newton_x_ant;
     double secante_x_ant, secante_x, secante_crit;
+    double erro_abs = 0, erro_relat = 0;
 
     secante_x = newton_x = x_inicial;
 
     newton_crit = 0;
     secante_crit = 0;
 
-    double erro_abs = 0, erro_relat = 0;
     printf("iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat, ulp\n");
     printf("%d,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,0\n", iteracao++, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat);
     do {
@@ -87,7 +75,6 @@ int main(int argc, char **argv)
         newton_x_ant = newton_x;
         double numerador_newton = evaluator_evaluate_x(f, newton_x);
         double denominado_newton = evaluator_evaluate_x(f_der, newton_x);
-        // printf("%1.16e / %1.16e \n", numerador_newton, denominado_newton);
         newton_x = newton_x - (numerador_newton / denominado_newton);
 
         // Método da secante
@@ -102,10 +89,13 @@ int main(int argc, char **argv)
             secante_x = secante_x - secante_parcial;
         }
 
-        // printf("anterior: %1.16e, anterior anterior: %1.16e \n", secante_x, secante_x_ant);
         // Calcula erro
         erro_abs = newton_x - secante_x;
         erro_relat = fabs(erro_abs / newton_x);
+
+        // Calculo dos erros relativos
+        secante_crit = fabs((secante_x - secante_x_ant) / (secante_x != 0 ? secante_x : 1));
+        newton_crit = fabs((newton_x - newton_x_ant) / (newton_x != 0 ? newton_x : 1));
 
         // Calculo do ULP
         Double_t ULP , tempULP;
@@ -114,10 +104,6 @@ int main(int argc, char **argv)
         ULP.i = abs(ULP.i - tempULP.i) - 1;
         if(ULP.i < 0) ULP.i = 0;
 
-        // Calculo dos erros relativos
-        secante_crit = fabs((secante_x - secante_x_ant) / (secante_x != 0 ? secante_x : 1));
-        newton_crit = fabs((newton_x - newton_x_ant) / (newton_x != 0 ? newton_x : 1));
-        
         // Imprime resultado parcial
         printf("%d,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%1.16e,%ld\n", iteracao, newton_x, newton_crit, secante_x, secante_crit, erro_abs, erro_relat, ULP.i);
 
