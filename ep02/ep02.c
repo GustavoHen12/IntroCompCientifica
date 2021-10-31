@@ -12,13 +12,12 @@ typedef struct {
 } Diagonais;
 
 // Inicia D com n diagonais sendo a maior de tamanho tam
-// Todas as diagonais serão preenchidas com 0
 void inicializa_diagonais(Diagonais *D, int n, int k){
   D->M = (double **)malloc(k * sizeof(double *));
   int tamAtual = n - (k / 2);
   int incrTam = 1;
   for(int i=0; i < k; i++){
-    D->M[i] = (double *)calloc(tamAtual, sizeof(double));
+    D->M[i] = (double *)malloc(tamAtual * sizeof(double));
     if (tamAtual == n) incrTam = -1;
     tamAtual += incrTam;
   }
@@ -63,6 +62,8 @@ void funcoesStdin_diagonais(Diagonais *D){
   }
 }
 
+// Inicializa D com k diagonais de matriz n x n
+// aplica funções da entrada nessas diagonais com x sendo o indice do elemento na diagonal
 void leParametrosDiagonais(Diagonais *D, int *n, int *k){
   scanf("%d %d", n, k);
   getchar();
@@ -70,12 +71,38 @@ void leParametrosDiagonais(Diagonais *D, int *n, int *k){
   funcoesStdin_diagonais(D);
 }
 
+// Inicializa vetor de tamanho n
+// Aplica função da entrada em seus elementos, sendo x o indice do elemento
+void leTermosIndependentes(double **independentes, int n){
+  void *f;
+  char func[INPUT_SIZE];
+  scanf("%[^\t\n]s", func);
+  getchar();
+  f = inicia_funcao(func);
+  *independentes = malloc(n * sizeof(double));
+
+  for (int i = 0; i < n; i++){
+    (*independentes)[i] = evaluator_evaluate_x(f, i);
+  }
+}
+
+// Imprime vetor de doubles com 6 casas decimais
+void imprime_independentes(double *independentes, int n){
+  for (int i = 0; i < n; i++){
+    printf("[%0.6f] ", independentes[i]);
+  }
+  printf("\n");
+}
+
 int main(){
   Diagonais d;
+  double *independentes;
   int n, k;
   leParametrosDiagonais(&d, &n, &k);
+  leTermosIndependentes(&independentes, n);
   
   imprime_diagonais(&d);
+  imprime_independentes(independentes, n);
 
   return 0;
 }
