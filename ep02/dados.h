@@ -1,0 +1,1 @@
+// Para abstrais a diagonal e as funções

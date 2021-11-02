@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <matheval.h>
 #include <math.h>
+#include "utils.h"
 
 #define INPUT_SIZE 256
 
@@ -83,15 +84,135 @@ void leParametrosDiagonais(Diagonais *D, int *n, int *k){
   inicializa_diagonais(D, *n, *k);
 }
 
+/*******/
+//Funções para calculo do gauss seidel
+
+double getValorDiagonal(Diagonais *D, int coluna, int linha){
+  if(coluna >= D->n || linha >= D->n){
+    return 0;
+  }
+
+  int diagonal = ((coluna - linha) * -1) + D->k/2;
+
+  if(diagonal < 0 || diagonal >= D->k){
+    return 0;
+  }
+
+  int elem_diag = (coluna - linha) > 0 ? coluna - (coluna - linha) : coluna;  
+
+  int tam_diag = D->n - abs(coluna - linha) - 1;
+  if(elem_diag > tam_diag){
+    return 0;
+  }
+
+  return D->M[diagonal][elem_diag];
+}
+
+void iteracaoGaussSeildel(Diagonais *D, double *X, double *independentes, int iteracao){
+  // para cada linha
+  int p = D->k / 2; // superior
+  int q = D->k / 2; // inferior
+  double soma;
+  for(int i = 0; i < D->n; i++){
+    soma = 0;
+
+    // Se linha possui elementos a direita da diagonal
+    if(i < D->n){
+      // Soma elementos a direita da diagonal principal
+      for(int j = i+1; (j < D->n) && (j <= i+p); j++){
+        soma += getValorDiagonal(D, j, i)*X[j];
+      }
+    }
+    //printf("Soma direita: %0.6f \n", soma);
+
+    // Se linha possui elementos a esquerda da diagonal
+    if(i > 0){
+      // Soma elementos a esquerda da diagonal principal
+      for(int j = i-1; (j >= 0) && (j >= (i-q)); j--){
+        soma += getValorDiagonal(D, j, i)*X[j];
+      }
+    }
+    //printf("Soma total: %0.6f \n", soma);
+
+    // Subtrai dos termos independentes e divide
+    double valor_iteracao = independentes[i] - soma;
+    valor_iteracao = valor_iteracao / D->M[p][i];
+    
+    //printf("X%d: %0.6f \n", i, valor_iteracao);
+    X[i] = valor_iteracao;
+  }
+}
+
+int criterioParada(double erro, double epsilon){
+  return 0;
+}
+
+double calculaErro(Diagonais* d){
+  return 1.0;
+}
+
+void gaussSeidel(Diagonais *diagonais, double *X, double *indenpendentes, int max_iter, double epsilon){
+  int iteracao = 0;
+  double erro = epsilon + 100;
+  while(iteracao < max_iter && !criterioParada(erro, epsilon)){
+    iteracaoGaussSeildel(diagonais, X, indenpendentes, iteracao);
+
+    printf("> %d :", iteracao);
+    for(int i = 0; i < diagonais->n; i++){
+      printf(" X[%d] = %0.6f", i, X[i]);
+    }
+    printf("\n");
+
+    erro = calculaErro(diagonais);
+    iteracao++;
+  }
+}
+
 int main(){
   Diagonais d;
   double *independentes;
+  double *x;
   int n, k;
+  int max_iter;
+  double epsilon;
+
   leParametrosDiagonais(&d, &n, &k);
   leTermosVetor(&independentes, n);
+  scanf("%lf", &epsilon);
+  scanf("%d", &max_iter);
+  x = malloc(n * sizeof(double));
+
+  // Zera vetor com resultados
+  for(int i = 0; i < n; i++){
+    x[i] = 0;
+  }
+
+  // Imprime "Matriz"
+  for(int i = 0; i < n; i++){
+    printf("|");
+    for(int j = 0; j < n; j++){
+      printf(" %0.2f ", getValorDiagonal(&d, j, i));
+      fflush(stdout);
+    }
+    printf("|   | %0.2f |\n", independentes[i]);
+    
+  }
   
+  // Calcula resultado
+  double tempo;
+  tempo = timestamp();
+
+  gaussSeidel(&d, x, independentes, max_iter, epsilon);
+  tempo = timestamp() - tempo;
+
   imprime_diagonais(&d);
   imprime_vetor(independentes, n);
 
+  printf("solução:");
+  for(int i = 0; i < n; i++){
+    printf(" %0.6f", x[i]);
+  }
+  printf("\n");
+  printf("tempo: %0.6f\n", tempo);
   return 0;
 }

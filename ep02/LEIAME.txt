@@ -1,0 +1,7 @@
+Nome:                     |  GRR:          |  Login do dinf:
+Iago Mello Floriano       |  GRR:20196049  |  imf19@inf.ufpr.br
+Gustavo H. da S. Barbosa  |  GRR:20190485  |  ghsb19@inf.ufpr.br
+
+Critério de parada é o erro relativo entre o valor obtido e o valor obtido anteriormente |(Xi - Xi-1) / Xi|.
+Caso Xi seja 0 se usa o erro absoluto |(Xi - Xi-1)| para se evitar divisão por 0.
+Usamos esse critério pois os métodos convergem, e caso a diferença entre uma iteração e outra seja menor que o epsilon desejado o método já estará chegando perto o suficiente desejado.
