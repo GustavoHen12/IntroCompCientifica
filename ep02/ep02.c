@@ -84,6 +84,28 @@ void leParametrosDiagonais(Diagonais *D, int *n, int *k){
   inicializa_diagonais(D, *n, *k);
 }
 
+void copiaVetor(double *vetA, double *vetB, int tam){
+  for(int i = 0; i < tam; i++){
+    vetA[i] = vetB[i];
+  }
+}
+
+void leParametrosGaussSeildel(double *epsilon, int *max_iter){
+  scanf("%lf", epsilon);
+  scanf("%d", max_iter);
+}
+
+double *iniciaVetorResultados (int n){
+  double *x = malloc(n * sizeof(double));
+
+  // Zera vetor com resultados
+  for(int i = 0; i < n; i++){
+    x[i] = 0;
+  }
+
+  return x;
+}
+
 // Recebe uma linhaXcoluna da matrix
 // e a partir das diagonais D retorna o elemento correspondente
 double getValorDiagonal(Diagonais *D, int coluna, int linha){
@@ -145,8 +167,16 @@ int criterioParada(double erro, double epsilon){
   return 0;
 }
 
-double calculaErro(Diagonais* d){
-  return 1.0;
+double calculaErro(double *x_ant, double *x, int tam){
+  double maior = 0;
+  for(int i = 0; i < tam; i++){
+    double erro = fabs((x[i] - x_ant[i]));
+    if(erro > maior){
+      maior = erro;
+    }
+  }
+
+  return maior;
 }
 
 void imprimeResultado(double *X, int n){
@@ -155,35 +185,24 @@ void imprimeResultado(double *X, int n){
     }
     printf("\n");  
 }
+
 void gaussSeidel(Diagonais *diagonais, double *X, double *indenpendentes, int max_iter, double epsilon){
   int iteracao = 0;
   double erro = epsilon + 100;
-  while(iteracao < max_iter && !criterioParada(erro, epsilon)){
+  double *X_ant = iniciaVetorResultados(diagonais->n);
+  while(iteracao < max_iter && !(erro < epsilon)){
+    copiaVetor(X_ant, X, diagonais->n);
     iteracaoGaussSeildel(diagonais, X, indenpendentes);
 
-    printf("> %d :", iteracao);
-    imprimeResultado(X, diagonais->n);
+    // printf("> %d :", iteracao);
+    // imprimeResultado(X, diagonais->n);
 
-    erro = calculaErro(diagonais);
+    erro = calculaErro(X_ant, X, diagonais->n);
+    // printf("erro: %0.6f\n", erro);
     iteracao++;
   }
 }
 
-void leParametrosGaussSeildel(double *epsilon, int *max_iter){
-  scanf("%lf", epsilon);
-  scanf("%d", max_iter);
-}
-
-double *iniciaVetorResultados (int n){
-  double *x = malloc(n * sizeof(double));
-
-  // Zera vetor com resultados
-  for(int i = 0; i < n; i++){
-    x[i] = 0;
-  }
-
-  return x;
-}
 
 int main(){
   Diagonais d;
@@ -199,14 +218,14 @@ int main(){
   x = iniciaVetorResultados(n);
 
   // Imprime "Matriz"
-  for(int i = 0; i < n; i++){
-    printf("|");
-    for(int j = 0; j < n; j++){
-      printf(" %0.2f ", getValorDiagonal(&d, j, i));
-      fflush(stdout);
-    }
-    printf("|   | %0.2f |\n", independentes[i]); 
-  }
+  // for(int i = 0; i < n; i++){
+  //   printf("|");
+  //   for(int j = 0; j < n; j++){
+  //     printf(" %0.2f ", getValorDiagonal(&d, j, i));
+  //     fflush(stdout);
+  //   }
+  //   printf("|   | %0.2f |\n", independentes[i]); 
+  // }
   
   // Calcula resultado
   double tempo;
