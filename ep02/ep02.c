@@ -51,6 +51,8 @@ int main(){
 
   imprime_diagonais(&d);
   imprime_vetor(independentes, n);
+  
+  printf("----\n");
 
   printf("solução:");
   imprimeResultado(x, n);

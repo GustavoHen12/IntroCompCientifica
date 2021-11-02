@@ -2,6 +2,24 @@ Nome:                     |  GRR:          |  Login do dinf:
 Iago Mello Floriano       |  GRR:20196049  |  imf19@inf.ufpr.br
 Gustavo H. da S. Barbosa  |  GRR:20190485  |  ghsb19@inf.ufpr.br
 
-Critério de parada é o erro relativo entre o valor obtido e o valor obtido anteriormente |(Xi - Xi-1) / Xi|.
-Caso Xi seja 0 se usa o erro absoluto |(Xi - Xi-1)| para se evitar divisão por 0.
-Usamos esse critério pois os métodos convergem, e caso a diferença entre uma iteração e outra seja menor que o epsilon desejado o método já estará chegando perto o suficiente desejado.
+Estrutura de dados:
+
+A nossa estrutura de dados principal, utilizada para definir as k-diagonais da matriz é:
+
+typedef struct {
+  double **M; //Matriz onde terá as diagonais
+  int n; //Tamanho da maior diagonal
+  int k; //Quantidade de diagonais
+} Diagonais;
+
+Cada linha da matriz M corresponde a uma diagonal, sendo que o elemento inicial da diagonal é o de índice 0.
+Já o tamanho da Matriz, está armazenada no parâmetro n, ou seja, uma matriz n x n, e a quantidade de diagonais no valor k.
+
+Execução e saída:
+
+Para execução do programa basta executar:
+    > make
+    > ./ep02 < entrada.in > saida.out
+
+A saída do programa corresponde a k linhas contendo as diagonais de entrada, uma linha contendo os termos independentes
+uma linha contendo os valores calculados, sendo em ordem X0, X1, ..., Xn e uma linha indicando o tempo de execução do gauss-seidel.
