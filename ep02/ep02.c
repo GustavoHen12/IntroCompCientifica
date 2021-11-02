@@ -84,31 +84,32 @@ void leParametrosDiagonais(Diagonais *D, int *n, int *k){
   inicializa_diagonais(D, *n, *k);
 }
 
-/*******/
-//Funções para calculo do gauss seidel
-
+// Recebe uma linhaXcoluna da matrix
+// e a partir das diagonais D retorna o elemento correspondente
 double getValorDiagonal(Diagonais *D, int coluna, int linha){
+  // Verifica se esta dentro da matriz
   if(coluna >= D->n || linha >= D->n){
     return 0;
   }
 
+  // Calcula em qual diagonal esta
   int diagonal = ((coluna - linha) * -1) + D->k/2;
-
   if(diagonal < 0 || diagonal >= D->k){
     return 0;
   }
 
-  int elem_diag = (coluna - linha) > 0 ? coluna - (coluna - linha) : coluna;  
-
+  // Calcula qual o indice do elemento na diagonal
+  int ind_diag = (coluna - linha) > 0 ? coluna - (coluna - linha) : coluna;  
   int tam_diag = D->n - abs(coluna - linha) - 1;
-  if(elem_diag > tam_diag){
+  if(ind_diag > tam_diag){
     return 0;
   }
 
-  return D->M[diagonal][elem_diag];
+  return D->M[diagonal][ind_diag];
 }
 
-void iteracaoGaussSeildel(Diagonais *D, double *X, double *independentes, int iteracao){
+// Faz o cáullculo para UMA interação do método Gauss-Seidel
+void iteracaoGaussSeildel(Diagonais *D, double *X, double *independentes){
   // para cada linha
   int p = D->k / 2; // superior
   int q = D->k / 2; // inferior
@@ -123,7 +124,6 @@ void iteracaoGaussSeildel(Diagonais *D, double *X, double *independentes, int it
         soma += getValorDiagonal(D, j, i)*X[j];
       }
     }
-    //printf("Soma direita: %0.6f \n", soma);
 
     // Se linha possui elementos a esquerda da diagonal
     if(i > 0){
@@ -132,13 +132,11 @@ void iteracaoGaussSeildel(Diagonais *D, double *X, double *independentes, int it
         soma += getValorDiagonal(D, j, i)*X[j];
       }
     }
-    //printf("Soma total: %0.6f \n", soma);
 
     // Subtrai dos termos independentes e divide
     double valor_iteracao = independentes[i] - soma;
     valor_iteracao = valor_iteracao / D->M[p][i];
     
-    //printf("X%d: %0.6f \n", i, valor_iteracao);
     X[i] = valor_iteracao;
   }
 }
@@ -151,21 +149,40 @@ double calculaErro(Diagonais* d){
   return 1.0;
 }
 
+void imprimeResultado(double *X, int n){
+    for(int i = 0; i < n; i++){
+      printf(" X[%d] = %0.6f", i, X[i]);
+    }
+    printf("\n");  
+}
 void gaussSeidel(Diagonais *diagonais, double *X, double *indenpendentes, int max_iter, double epsilon){
   int iteracao = 0;
   double erro = epsilon + 100;
   while(iteracao < max_iter && !criterioParada(erro, epsilon)){
-    iteracaoGaussSeildel(diagonais, X, indenpendentes, iteracao);
+    iteracaoGaussSeildel(diagonais, X, indenpendentes);
 
     printf("> %d :", iteracao);
-    for(int i = 0; i < diagonais->n; i++){
-      printf(" X[%d] = %0.6f", i, X[i]);
-    }
-    printf("\n");
+    imprimeResultado(X, diagonais->n);
 
     erro = calculaErro(diagonais);
     iteracao++;
   }
+}
+
+void leParametrosGaussSeildel(double *epsilon, int *max_iter){
+  scanf("%lf", epsilon);
+  scanf("%d", max_iter);
+}
+
+double *iniciaVetorResultados (int n){
+  double *x = malloc(n * sizeof(double));
+
+  // Zera vetor com resultados
+  for(int i = 0; i < n; i++){
+    x[i] = 0;
+  }
+
+  return x;
 }
 
 int main(){
@@ -178,14 +195,8 @@ int main(){
 
   leParametrosDiagonais(&d, &n, &k);
   leTermosVetor(&independentes, n);
-  scanf("%lf", &epsilon);
-  scanf("%d", &max_iter);
-  x = malloc(n * sizeof(double));
-
-  // Zera vetor com resultados
-  for(int i = 0; i < n; i++){
-    x[i] = 0;
-  }
+  leParametrosGaussSeildel(&epsilon, &max_iter);
+  x = iniciaVetorResultados(n);
 
   // Imprime "Matriz"
   for(int i = 0; i < n; i++){
@@ -194,8 +205,7 @@ int main(){
       printf(" %0.2f ", getValorDiagonal(&d, j, i));
       fflush(stdout);
     }
-    printf("|   | %0.2f |\n", independentes[i]);
-    
+    printf("|   | %0.2f |\n", independentes[i]); 
   }
   
   // Calcula resultado
@@ -209,10 +219,8 @@ int main(){
   imprime_vetor(independentes, n);
 
   printf("solução:");
-  for(int i = 0; i < n; i++){
-    printf(" %0.6f", x[i]);
-  }
-  printf("\n");
+  imprimeResultado(x, n);
+
   printf("tempo: %0.6f\n", tempo);
   return 0;
 }
