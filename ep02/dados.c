@@ -20,7 +20,7 @@ void inicializa_diagonais(Diagonais *D, int n, int k){
 
 void imprime_vetor(double *vetor, int n){
   for (int i = 0; i < n; i++){
-    printf("%0.0f ", vetor[i]);
+    printf("%0.6f ", vetor[i]);
   }
   printf("\n");
 }

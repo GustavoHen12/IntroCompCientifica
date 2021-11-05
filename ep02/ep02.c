@@ -54,7 +54,7 @@ int main(){
   
   printf("----\n");
 
-  printf("solução:");
+  printf("solucao:");
   imprimeResultado(x, n);
 
   printf("tempo: %0.6f\n", tempo);
