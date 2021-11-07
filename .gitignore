@@ -1,0 +1,8 @@
+*.o
+battleCity
+!*.txt
+!*.in
+!*.out
+!*.c
+!*.h
+!Makefile
