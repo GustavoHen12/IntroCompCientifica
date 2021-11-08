@@ -25,7 +25,7 @@
 
 typedef struct {
   void **F; // Sistema não linear
-  void *Jacobiana; // Matriz jacobiana
+  void ***Jacobiana; // Matriz jacobiana
   double *aprox_inicial; // Aproximação inicial
   double epsilon_1; // epsilon X
   double epsilon_2; // epsilon Y

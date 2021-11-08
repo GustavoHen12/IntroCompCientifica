@@ -31,6 +31,9 @@ void novoSnl(SNL *snl, int tamanho){
   //Realiza alocações
   snl->F = malloc(sizeof(void) * tamanho);
   snl->Jacobiana = malloc(sizeof(void) * tamanho);
+  for (int i = 0 ; i < tamanho; i++){
+    snl->Jacobiana[i] = malloc(sizeof(void) * tamanho);
+  }
   snl->aprox_inicial = malloc(sizeof(double) * tamanho);
   snl->epsilon_1 = 0.0;
   snl->epsilon_2 = 0.0;
@@ -38,13 +41,16 @@ void novoSnl(SNL *snl, int tamanho){
 }
 
 void calculaJacobiana(SNL *snl){
-  // int tamanho = snl->n;
-  // for(int i = 0; i < tamanho; i++){
-  //   char funcaoStr[INPUT_SIZE];
-  //   scanf("%[^\t\n]s", funcaoStr);
-  //   getchar();
-  //   snl->F[i] = evaluator_create(funcaoStr);
-  // }
+  int tamanho = snl->n;
+  for(int i = 0; i < tamanho; i++){
+    void *funcAtual = snl->F[i]; //Salvar função para derivar
+    char **names;
+    int count;
+    evaluator_get_variables(funcAtual, &names, &count); //Informações sobre a função
+    for(int j=0; j < count; j++){
+      snl->Jacobiana[i][j] = evaluator_derivative(funcAtual, names[j]);
+    }
+  }
 
 }
 
@@ -86,6 +92,15 @@ void imprimeSNLiniciaSnlEntrada(SNL *snl){
   for(int i = 0; i < tamanho; i++){
     printf("%s \n", evaluator_get_string(snl->F[i]));
   }
+
+  // //Imprimir da jacobiana REMOVER DEPOIS
+  // printf("Jacobiana:\n");
+  // for(int i = 0; i < tamanho; i++){
+  //   printf("\tLinha %d:\n", i);
+  //   for(int j = 0; j < tamanho; j++){
+  //     printf("\t\t%s \n", evaluator_get_string(snl->Jacobiana[i][j]));
+  //   }
+  // }
 
   // Aproximação inicial
   printf("X0:");
