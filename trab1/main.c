@@ -10,17 +10,26 @@
 #include"dados.h"
 #include"newton.h"
 
+FILE *abreEntrada(int argc, char *argv[]);
+
 int main(int argc, char *argv[]){
-   char *nomeArquivoSaida = recebeNomeArquivoSaida(argc, argv);
+   FILE *arqOut = abreEntrada(argc, argv);
    SNL snl;
    int tamanho = 0;
    while(!feof(stdin) && scanf("%d\n", &tamanho) == 1){
        novoSnl(&snl, tamanho);
        double tempoMatrixJacobiana = iniciaSnlEntrada(&snl);
-       imprimeSNLiniciaSnlEntrada(&snl);
+       imprimeSNLiniciaSnlEntrada(arqOut, &snl);
     //   Resultado param = calculaSNL(snl);
     //    imprimeResultado(nomeArquivoSaida);
     //    imprimeTempos(nomeArquivoSaida);
         //encerraSNL(&snl);
    }
+}
+
+FILE *abreEntrada(int argc, char *argv[]){
+   char *nomeArquivoSaida = recebeNomeArquivoSaida(argc, argv);
+   FILE *arqOut = fopen(nomeArquivoSaida, "w");
+   if (!arqOut) arqOut = stdout;
+   return(arqOut);
 }

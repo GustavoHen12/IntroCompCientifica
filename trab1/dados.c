@@ -8,7 +8,8 @@ char *recebeNomeArquivoSaida(int argc, char *argv[]){
        if(option == 'o'){
            filename = optarg;
        }else{
-           return 0;
+           fprintf(stderr, "Nenhum arquivo para escrita especificado, usando saída padrão (stdout)\n");
+           return NULL;
        }
    }
 
@@ -81,37 +82,37 @@ double iniciaSnlEntrada(SNL *snl){
   return 0;
 }
 
-void imprimeSNLiniciaSnlEntrada(SNL *snl){
-  printf("SNL[%d]: \n", snl->n);
-  fflush(stdout); 
+void imprimeSNLiniciaSnlEntrada(FILE *arqOut, SNL *snl){
+  fprintf(arqOut, "SNL[%d]: \n", snl->n);
+  fflush(arqOut); 
 
   int tamanho = snl->n;
   // Matriz do sistema não linear
   /* Print variable names appearing in function. */
-  printf("sistema:\n");
+  fprintf(arqOut, "sistema:\n");
   for(int i = 0; i < tamanho; i++){
-    printf("%s \n", evaluator_get_string(snl->F[i]));
+    fprintf(arqOut, "%s \n", evaluator_get_string(snl->F[i]));
   }
 
   // //Imprimir da jacobiana REMOVER DEPOIS
-  // printf("Jacobiana:\n");
+  // fprintf(arqOut, "Jacobiana:\n");
   // for(int i = 0; i < tamanho; i++){
-  //   printf("\tLinha %d:\n", i);
+  //   fprintf(arqOut, "\tLinha %d:\n", i);
   //   for(int j = 0; j < tamanho; j++){
-  //     printf("\t\t%s \n", evaluator_get_string(snl->Jacobiana[i][j]));
+  //     fprintf(arqOut, "\t\t%s \n", evaluator_get_string(snl->Jacobiana[i][j]));
   //   }
   // }
 
   // Aproximação inicial
-  printf("X0:");
+  fprintf(arqOut, "X0:");
   for(int i = 0; i < tamanho; i++){
-    printf(" %le ", snl->aprox_inicial[i]);
+    fprintf(arqOut, " %le ", snl->aprox_inicial[i]);
   }
-  printf("\n");
+  fprintf(arqOut, "\n");
 
   // Epsilon
-  printf("epsilon: %0.6f\n", snl->epsilon_1);
+  fprintf(arqOut, "epsilon: %0.6f\n", snl->epsilon_1);
 
   // Maximo de iterações
-  printf("maxIter: %d\n", snl->max_iter);
+  fprintf(arqOut, "maxIter: %d\n", snl->max_iter);
 }

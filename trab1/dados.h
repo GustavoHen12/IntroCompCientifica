@@ -43,7 +43,7 @@ double iniciaSnlEntrada(SNL *snl);
 
 // void imprimeTempos(char *nomeArquivoSaida);
 
-void imprimeSNLiniciaSnlEntrada(SNL *snl);
+void imprimeSNLiniciaSnlEntrada(FILE *arqOut, SNL *snl);
 
 // int fimDaEntrada();
 
