@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <matheval.h>
+#include "utils.h"
 
 #define STRING_SIZE 100
 #define INPUT_SIZE 256
@@ -39,12 +40,12 @@ void novoSnl(SNL *snl, int tamanho);
 
 double iniciaSnlEntrada(SNL *snl);
 
+void imprimeSNL(FILE *arqOut, SNL *snl);
+
+// int fimDaEntrada();
+
 // void imprimeResultado(char *nomeArquivoSaida);
 
 // void imprimeTempos(char *nomeArquivoSaida);
-
-void imprimeSNLiniciaSnlEntrada(FILE *arqOut, SNL *snl);
-
-// int fimDaEntrada();
 
 #endif

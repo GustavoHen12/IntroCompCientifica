@@ -17,10 +17,10 @@ int main(int argc, char *argv[]){
    SNL snl;
    int tamanho = 0;
    while(!feof(stdin) && scanf("%d\n", &tamanho) == 1){
-       novoSnl(&snl, tamanho);
-       double tempoMatrixJacobiana = iniciaSnlEntrada(&snl);
-       imprimeSNLiniciaSnlEntrada(arqOut, &snl);
-    //   Resultado param = calculaSNL(snl);
+      novoSnl(&snl, tamanho);
+      double tempoDerivadas = iniciaSnlEntrada(&snl);
+      imprimeSNL(arqOut, &snl);
+      Resultado *param = calculaSNL(&snl, arqOut);
     //    imprimeResultado(nomeArquivoSaida);
     //    imprimeTempos(nomeArquivoSaida);
         //encerraSNL(&snl);

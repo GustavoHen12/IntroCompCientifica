@@ -14,11 +14,11 @@
 #include"dados.h"
 
 typedef struct {
-  double **M; //Matriz onde terá as diagonais
-  int n; //Tamanho da maior diagonal
-  int k; //Quantidade de diagonais
+  double tempoTotal;
+  double tempoJacobianas;
+  double tempoSistemaLinear;
 } Resultado;
 
-Resultado calculaSNL();
+Resultado *calculaSNL(SNL *snl, FILE *saida);
 
 #endif

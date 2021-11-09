@@ -16,13 +16,6 @@ char *recebeNomeArquivoSaida(int argc, char *argv[]){
    return filename;
 }
 
-// Função para iniciar uma função
-// Recebe como parametro uma string e retorna um ponteiro para função
-void* inicia_funcao(char* funcao){
-    void* f = evaluator_create(funcao);
-    return f;
-}
-
 void novoSnl(SNL *snl, int tamanho){
   if(tamanho == 0){ //erro
     return;
@@ -41,6 +34,8 @@ void novoSnl(SNL *snl, int tamanho){
   snl->max_iter = 0;
 }
 
+// A partir da funcão de entrada do sistema não linear
+// calcula a derivada parcial para cáculo da matriz jacobiana
 void calculaJacobiana(SNL *snl){
   int tamanho = snl->n;
   for(int i = 0; i < tamanho; i++){
@@ -78,11 +73,15 @@ double iniciaSnlEntrada(SNL *snl){
   scanf("%d", &snl->max_iter);
   getchar();
 
+  double tempoDerivadas;
+  tempoDerivadas = timestamp();
   calculaJacobiana(snl);
-  return 0;
+  tempoDerivadas = timestamp() - tempoDerivadas;
+  
+  return tempoDerivadas;
 }
 
-void imprimeSNLiniciaSnlEntrada(FILE *arqOut, SNL *snl){
+void imprimeSNL(FILE *arqOut, SNL *snl){
   fprintf(arqOut, "SNL[%d]: \n", snl->n);
   fflush(arqOut); 
 
