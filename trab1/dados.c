@@ -1,23 +1,23 @@
-#include"dados.h"
+#include "dados.h"
 
-char *recebeNomeArquivoSaida(int argc, char *argv[]){
-    char *filename = malloc(sizeof(char) * STRING_SIZE);
-    // Lê possível arquivo de saída
-   int option;
-   while ((option = getopt (argc, argv, "o:")) != -1){
-       if(option == 'o'){
-           filename = optarg;
-       }else{
-           fprintf(stderr, "Nenhum arquivo para escrita especificado, usando saída padrão (stdout)\n");
-           return NULL;
-       }
-   }
+char *recebeNomeArquivoSaida (int argc, char *argv[]) {
+  char *filename = malloc(sizeof(char) * STRING_SIZE);
+  // Lê possível arquivo de saída
+  int option;
+  while ((option = getopt(argc, argv, "o:")) != -1) {
+    if (option == 'o') {
+      filename = optarg;
+    } else {
+      fprintf(stderr, "Nenhum arquivo para escrita especificado, usando saída padrão (stdout)\n");
+      return NULL;
+    }
+  }
 
-   return filename;
+  return filename;
 }
 
-void novoSnl(SNL *snl, int tamanho){
-  if(tamanho == 0){ //erro
+void novoSnl(SNL *snl, int tamanho) {
+  if (tamanho == 0) { //erro
     return;
   }
 
@@ -25,7 +25,7 @@ void novoSnl(SNL *snl, int tamanho){
   //Realiza alocações
   snl->F = malloc(sizeof(void) * tamanho);
   snl->Jacobiana = malloc(sizeof(void) * tamanho);
-  for (int i = 0 ; i < tamanho; i++){
+  for (int i = 0; i < tamanho; i++) {
     snl->Jacobiana[i] = malloc(sizeof(void) * tamanho);
   }
   snl->aprox_inicial = malloc(sizeof(double) * tamanho);
@@ -36,25 +36,24 @@ void novoSnl(SNL *snl, int tamanho){
 
 // A partir da funcão de entrada do sistema não linear
 // calcula a derivada parcial para cáculo da matriz jacobiana
-void calculaJacobiana(SNL *snl){
+void calculaJacobiana(SNL *snl) {
   int tamanho = snl->n;
-  for(int i = 0; i < tamanho; i++){
+  for (int i = 0; i < tamanho; i++) {
     void *funcAtual = snl->F[i]; //Salvar função para derivar
     char **names;
     int count;
     evaluator_get_variables(funcAtual, &names, &count); //Informações sobre a função
-    for(int j=0; j < count; j++){
+    for (int j = 0; j < count; j++) {
       snl->Jacobiana[i][j] = evaluator_derivative(funcAtual, names[j]);
     }
   }
-
 }
 
-double iniciaSnlEntrada(SNL *snl){
+double iniciaSnlEntrada(SNL *snl) {
   int tamanho = snl->n;
 
   // Matriz do sistema não linear
-  for(int i = 0; i < tamanho; i++){
+  for (int i = 0; i < tamanho; i++) {
     char funcaoStr[INPUT_SIZE];
     scanf("%[^\t\n]s", funcaoStr);
     getchar();
@@ -62,7 +61,7 @@ double iniciaSnlEntrada(SNL *snl){
   }
 
   // Aproximação inicial
-  for(int i = 0; i < tamanho; i++){
+  for (int i = 0; i < tamanho; i++) {
     scanf("%le", &snl->aprox_inicial[i]);
   }
 
@@ -77,19 +76,19 @@ double iniciaSnlEntrada(SNL *snl){
   tempoDerivadas = timestamp();
   calculaJacobiana(snl);
   tempoDerivadas = timestamp() - tempoDerivadas;
-  
+
   return tempoDerivadas;
 }
 
-void imprimeSNL(FILE *arqOut, SNL *snl){
+void imprimeSNL(FILE *arqOut, SNL *snl) {
   fprintf(arqOut, "SNL[%d]: \n", snl->n);
-  fflush(arqOut); 
+  fflush(arqOut);
 
   int tamanho = snl->n;
   // Matriz do sistema não linear
   /* Print variable names appearing in function. */
   fprintf(arqOut, "sistema:\n");
-  for(int i = 0; i < tamanho; i++){
+  for (int i = 0; i < tamanho; i++) {
     fprintf(arqOut, "%s \n", evaluator_get_string(snl->F[i]));
   }
 
@@ -104,7 +103,7 @@ void imprimeSNL(FILE *arqOut, SNL *snl){
 
   // Aproximação inicial
   fprintf(arqOut, "X0:");
-  for(int i = 0; i < tamanho; i++){
+  for (int i = 0; i < tamanho; i++) {
     fprintf(arqOut, " %le ", snl->aprox_inicial[i]);
   }
   fprintf(arqOut, "\n");
