@@ -21,6 +21,9 @@ dados.o: dados.c dados.h utils.h
 utils.o: utils.c utils.h
 	gcc -c utils.c -o utils.o $(CFLAGS)
 
+linear.o: linear.c linear.h
+	gcc -c linear.c -o linear.o $(CFLAGS)
+
 clean:
 	-rm -f *~ *.o
 	
