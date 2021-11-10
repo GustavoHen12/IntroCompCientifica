@@ -11,7 +11,9 @@
 #ifndef __NEWTON__
 #define __NEWTON__
 
+#include <math.h>
 #include"dados.h"
+#include"linear.h"
 
 typedef struct {
   double tempoTotal;
