@@ -15,7 +15,6 @@ double  *calculculaSistemaLinear(double **sistema, double *termos_independentes,
     double total = 0;
     for(int j = i+1; j < tam; j++)
       total += sistema[i][j] * variaveis[j];
-    printf("total: %0.2f\n", total);
     variaveis[i] = (termos_independentes[i] - total) / sistema[i][i];
   }
 
