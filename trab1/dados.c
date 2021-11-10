@@ -92,14 +92,14 @@ void imprimeSNL(FILE *arqOut, SNL *snl) {
     fprintf(arqOut, "%s \n", evaluator_get_string(snl->F[i]));
   }
 
-  // //Imprimir da jacobiana REMOVER DEPOIS
-  // fprintf(arqOut, "Jacobiana:\n");
-  // for(int i = 0; i < tamanho; i++){
-  //   fprintf(arqOut, "\tLinha %d:\n", i);
-  //   for(int j = 0; j < tamanho; j++){
-  //     fprintf(arqOut, "\t\t%s \n", evaluator_get_string(snl->Jacobiana[i][j]));
-  //   }
-  // }
+  //Imprimir da jacobiana REMOVER DEPOIS
+  fprintf(arqOut, "Jacobiana:\n");
+  for(int i = 0; i < tamanho; i++){
+    fprintf(arqOut, "\tLinha %d:\n", i);
+    for(int j = 0; j < tamanho; j++){
+      fprintf(arqOut, "\t\t%s \n", evaluator_get_string(snl->Jacobiana[i][j]));
+    }
+  }
 
   // Aproximação inicial
   fprintf(arqOut, "X0:");
