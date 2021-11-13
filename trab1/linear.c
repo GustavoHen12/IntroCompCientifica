@@ -2,6 +2,8 @@
 
 double  *calculculaSistemaLinear(double **sistema, double *termos_independentes, int tam){
   int *transformacoes = malloc(tam * sizeof(int));
+  for (int i = 0; i < tam; i ++)
+    transformacoes[i] = i;
   // Zerar triangulo inferior
   for(int i = 0; i < tam; i++){
     pivoteia(sistema, termos_independentes, transformacoes, i, tam);

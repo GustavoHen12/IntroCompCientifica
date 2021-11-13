@@ -26,14 +26,17 @@ double getMaiorAbs (double *vet, int n){
 // sendo f = a_0*x_0 + a_1*x_1 + ... + a_n*x_n
 // Os valores de x, estão em ordem em x, e a função
 // corresponde a func. Retorna o valor resultante
-double aplicaFuncao(void *func, double *x){
+double aplicaFuncao(void *func, double *x, int tamanho){
   if(func == NULL){
     fprintf(stderr, "Ocorreu um erro ao calcular o valor\n");
     return 0;
   }
   char **variaveis;
-  int tamanho;
-  evaluator_get_variables(func, &variaveis, &tamanho);
+  variaveis = malloc(sizeof(char **) * tamanho);
+  for (int i = 0; i < tamanho; i++){
+    variaveis[i] = malloc(sizeof(char *) * tamanho);
+    sprintf(variaveis[i], "x%d", i+1);
+  }
   return evaluator_evaluate(func, tamanho, variaveis, x);
 }
 
@@ -102,7 +105,7 @@ void copiaVetor(double *vetA, double *vetB, int tam){
 void aplicaTermosJacobiana(void ***matriz, double *termos, int n, double **resultado) {
   for(int i = 0; i < n; i++){
     for(int j = 0; j < n; j++){
-      resultado[i][j] = aplicaFuncao(matriz[i][j], termos);
+      resultado[i][j] = aplicaFuncao(matriz[i][j], termos, n);
     }
   }
 }
@@ -111,7 +114,7 @@ void aplicaTermosJacobiana(void ***matriz, double *termos, int n, double **resul
 // O resultado de cada linha é colocado no vetor "resultado"
 void aplicaTermosMatriz(void **matriz, double *termos, int n, double *resultado) {
   for(int i = 0; i < n; i++){
-      resultado[i] = aplicaFuncao(matriz[i], termos) * -1;
+      resultado[i] = aplicaFuncao(matriz[i], termos, n) * -1;
   }
 }
 
@@ -130,11 +133,14 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
   }
 
   // Pega os nomes da variaveis para impressão da saída parcial
-  char **variaveis = NULL;
-  int tamanho;
-  if(snl->n > 0){
-    evaluator_get_variables(snl->F[0], &variaveis, &tamanho);
+  int tamanho = snl->n;
+  char **variaveis;
+  variaveis = malloc(sizeof(char **) * tamanho);
+  for (int i = 0; i < tamanho; i++){
+    variaveis[i] = malloc(sizeof(char *) * tamanho);
+    sprintf(variaveis[i], "x%d", i+1);
   }
+
 
   // Variaveis para pegar os tempos
   DadosExecucao *dadosExec = inciaDadosExecucao();

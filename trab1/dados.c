@@ -32,10 +32,13 @@ void novoSnl(SNL *snl, int tamanho) {
 
   snl->n = tamanho;
   //Realiza alocações
-  snl->F = malloc(sizeof(void) * tamanho);
-  snl->Jacobiana = malloc(sizeof(void) * tamanho);
+  snl->F = malloc(sizeof(void *) * tamanho);
+  if(!snl->F) printf("erro ao alocar f\n");
+  snl->Jacobiana = malloc(sizeof(void **) * tamanho);
+  if(!snl->Jacobiana) printf("erro ao alocar j\n");
   for (int i = 0; i < tamanho; i++) {
-    snl->Jacobiana[i] = malloc(sizeof(void) * tamanho);
+    snl->Jacobiana[i] = malloc(sizeof(void *) * tamanho);
+    if(!snl->Jacobiana[i]) printf("erro ao alocar J[%d]\n", i);
   }
   snl->aprox_inicial = malloc(sizeof(double) * tamanho);
   snl->epsilon = 0.0;
@@ -46,14 +49,20 @@ void novoSnl(SNL *snl, int tamanho) {
 // calcula a derivada parcial para cáculo da matriz jacobiana
 void calculaJacobiana(SNL *snl) {
   int tamanho = snl->n;
+  char **names;
+  names = malloc(sizeof(char **) * tamanho);
+  for (int i = 0; i < tamanho; i++){
+    names[i] = malloc(sizeof(char *) * tamanho);
+    sprintf(names[i], "x%d", i+1);
+  }
   for (int i = 0; i < tamanho; i++) {
     void *funcAtual = snl->F[i]; //Salvar função para derivar
-    char **names;
-    int count;
-    evaluator_get_variables(funcAtual, &names, &count); //Informações sobre a função
-    for (int j = 0; j < count; j++) {
+    printf("\t\t %s:\n", evaluator_get_string(funcAtual));
+    for (int j = 0; j < tamanho; j++) {
       snl->Jacobiana[i][j] = evaluator_derivative(funcAtual, names[j]);
+      printf("\t\t\t %s : %d\n", evaluator_get_string(snl->Jacobiana[i][j]), j+1);
     }
+    printf("-----------------------\n");
   }
 }
 
