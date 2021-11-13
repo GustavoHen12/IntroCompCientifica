@@ -46,7 +46,7 @@ double aplicaFuncao(void *func, double *x, int tamanho){
 void imprimeInicio(void **F, int num, FILE *saida){
   fprintf(saida, "%d\n", num);
   for (int i = 0; i < num; i++)
-    fprintf(saida, "%s\n", evaluator_get_string(F[i]));
+    fprintf(saida, "%s = 0\n", evaluator_get_string(F[i]));
 }
 
 void imprimeResultado(double *vet, char **variaveis, int tamanho, FILE *saida) {
