@@ -61,11 +61,6 @@ void despivoteia(double **sistema, double *termos_independentes, int *transforma
     termos_independentes[trocar_com] = termos_independentes[i];
     termos_independentes[i] = tempD;
 
-    // modifica vetor nas variaveis que foram calculadas
-    tempD = variaveis[trocar_com];
-    variaveis[trocar_com] = variaveis[i];
-    variaveis[i] = tempD;
-
     // modifica vetor de transformacoes
     int temp = transformacoes[trocar_com];
     transformacoes[trocar_com] = transformacoes[i];
