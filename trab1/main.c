@@ -19,10 +19,9 @@ int main(int argc, char *argv[]){
   while (!feof(stdin) && scanf("%d\n", &tamanho) == 1){
     novoSnl(&snl, tamanho);
     double tempoDerivadas = iniciaSnlEntrada(&snl);
-    imprimeSNL(arqOut, &snl);
-    Resultado *param = calculaSNL(&snl, arqOut);
-    //    imprimeResultado(nomeArquivoSaida);
-    //    imprimeTempos(nomeArquivoSaida);
+    DadosExecucao *dadosExecucao = calculaSNL(&snl, arqOut);
+    adicionaTempoDerivadas(tempoDerivadas, dadosExecucao);
+    imprimeDadosExecucao(dadosExecucao, arqOut);
     //encerraSNL(&snl);
   }
 }

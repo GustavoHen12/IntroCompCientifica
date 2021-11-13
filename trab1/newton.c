@@ -1,8 +1,26 @@
+/************
+* CI1164-Trabalho 1
+*
+* Iago Mello Floriano - GRR:20196049 - imf19@inf.ufpr.br
+* Gustavo H. da S. Barbosa - GRR:20190485 - ghsb19@inf.ufpr.br 
+* 
+************/
+
 #include "newton.h"
 
-int verificaParada(SNL *snl) {
-  return 0;
+// ============ Funcões auxiliares ============
+
+double getMaiorAbs (double *vet, int n){
+  double maior = -1;
+  for(int i = 0; i < n; i++){
+    if(fabs(vet[i]) > maior)
+      maior = fabs(vet[i]);
+  }
+
+  return maior;
 }
+
+// ============ Funcões para manipulação da libmatheval ============
 
 // Aplica x_0, x_1, .., x_n em uma função f
 // sendo f = a_0*x_0 + a_1*x_1 + ... + a_n*x_n
@@ -19,23 +37,28 @@ double aplicaFuncao(void *func, double *x){
   return evaluator_evaluate(func, tamanho, variaveis, x);
 }
 
-// Recebe a matriz jacobiana ("matriz") de tamanho "n"x"n" e os termos independentes
-// ("termos") e aplica. O resultado é colocado na matriz "resultado"
-void aplicaTermosJacobiana(void ***matriz, double *termos, int n, double **resultado) {
-  for(int i = 0; i < n; i++){
-    for(int j = 0; j < n; j++){
-      resultado[i][j] = aplicaFuncao(matriz[i][j], termos);
-    }
+
+// ============ Impressão da saída ============
+
+void imprimeResultado(double *vet, char **variaveis, int tamanho, FILE *saida) {
+  fprintf(saida, "#\n");
+  for(int i = 0; i < tamanho; i++){
+    fprintf(saida, "%s = %0.6f \n", variaveis[i], vet[i]);
   }
 }
 
-// Aplica os termos "termos", na matriz "matriz" de tamanho "n"x"n".]
-// O resultado de cada linha é colocado no vetor "resultado"
-void aplicaTermosMatriz(void **matriz, double *termos, int n, double *resultado) {
-  for(int i = 0; i < n; i++){
-      resultado[i] = aplicaFuncao(matriz[i], termos) * -1;
-  }
+void imprimeDadosExecucao(DadosExecucao *dados, FILE *saida) {
+  fprintf(saida, "###########\n");
+  fprintf(saida, "# Tempo Total: %0.6f\n", dados->tempoTotal);
+  fprintf(saida, "# Tempo Derivadas: %0.6f\n", dados->tempoDerivadas);
+  fprintf(saida, "# Tempo Jacobiana: %0.6f\n", dados->tempoJacobianas);
+  fprintf(saida, "# Tempo SL: %0.6f\n", dados->tempoSistemaLinear);
+  fprintf(saida, "###########\n");
+
 }
+
+
+// ============ Funcões para manipulação dos dados dos vetores e matriz ============
 
 // Cria um vetor de tamanho "tamanho"
 // se ocorrer um erro, adiciona em sterr e retorna NULL
@@ -71,85 +94,142 @@ void copiaVetor(double *vetA, double *vetB, int tam){
   }
 }
 
-void imprimeMatriz(double **matriz, int n) {
+
+// ============ Calculo SNL ============
+
+// Recebe a matriz jacobiana ("matriz") de tamanho "n"x"n" e os termos independentes
+// ("termos") e aplica. O resultado é colocado na matriz "resultado"
+void aplicaTermosJacobiana(void ***matriz, double *termos, int n, double **resultado) {
   for(int i = 0; i < n; i++){
     for(int j = 0; j < n; j++){
-      printf(" %0.6f ", matriz[i][j]);
+      resultado[i][j] = aplicaFuncao(matriz[i][j], termos);
     }
-    printf("\n");
   }
-  printf("\n");
-
 }
 
-void imprimeVetor(double *vet, int n) {
+// Aplica os termos "termos", na matriz "matriz" de tamanho "n"x"n".]
+// O resultado de cada linha é colocado no vetor "resultado"
+void aplicaTermosMatriz(void **matriz, double *termos, int n, double *resultado) {
   for(int i = 0; i < n; i++){
-    printf(" %0.6f ", vet[i]);
+      resultado[i] = aplicaFuncao(matriz[i], termos) * -1;
   }
-  printf("\n");
 }
 
-double getMaiorAbs (double *vet, int n){
-  double maior = -1;
-  for(int i = 0; i < n; i++){
-    if(fabs(vet[i]) > maior)
-      maior = fabs(vet[i]);
-  }
-
-  return maior;
-}
-
-Resultado *calculaSNL(SNL *snl, FILE *saida){
+DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
   //verificar se SNL não é NULL
   if (snl == NULL || !(snl->n > 0)) {
     fprintf(stderr, "Sistema não linear inválido !\n");
   }
 
+  // Inicia variaveis utilizadas para calculo
   double *x = criaVetor(snl->n);
   double **tempJacobiana = criaMatriz(snl->n, snl->n);
   double *termosIndependentes = criaVetor(snl->n);
-
   if(x == NULL || tempJacobiana == NULL || termosIndependentes == NULL){
     return NULL;
   }
 
+  // Pega os nomes da variaveis para impressão da saída parcial
+  char **variaveis = NULL;
+  int tamanho;
+  if(snl->n > 0){
+    evaluator_get_variables(snl->F[0], &variaveis, &tamanho);
+  }
+
+  // Variaveis para pegar os tempos
+  DadosExecucao *dadosExec = inciaDadosExecucao();
+  double tempoTotal, tempoJacobiana, tempoSL;
+
+  // Copia vetor da aproximação incial para o com o valor de X
   copiaVetor(snl->aprox_inicial, x, snl->n);
 
   int iteracao = 0;
+  tempoTotal = timestamp();
   while (iteracao < snl->max_iter) {
-    
-    printf("Iteracao %d ", iteracao);
-    imprimeVetor(x, snl->n);
+
+    // Imprime resultado parcial encontrado na iteracao anterior    
+    imprimeResultado(x, variaveis, tamanho, saida);
 
     // Calculo do delta
     // Montar sistema linear
+    tempoJacobiana = timestamp();
     aplicaTermosJacobiana(snl->Jacobiana, x, snl->n, tempJacobiana);
+    adicionaTempoJacobiana((timestamp() - tempoJacobiana), dadosExec);
+
     aplicaTermosMatriz(snl->F, x, snl->n, termosIndependentes);
 
-    // Parada
-    if(getMaiorAbs(termosIndependentes, snl->n) < snl->epsilon_1){
+    // Verifica critério de parada termos independentes
+    if(getMaiorAbs(termosIndependentes, snl->n) < snl->epsilon){
       break;
     }
 
-    
     // Calcular sistema linear
-    double  *delta = calculculaSistemaLinear(tempJacobiana, termosIndependentes, snl->n);    
+    tempoSL = timestamp();
+    double  *delta = calculculaSistemaLinear(tempJacobiana, termosIndependentes, snl->n);
+    adicionaTempoSistemaLinear((timestamp() - tempoSL), dadosExec);  
 
-    // Calculo Xi+1
+    // Calcula X_i+1
     for(int i = 0; i < snl->n; i++){
       x[i] = x[i] + delta[i];
     }
 
-    // Parada
-    if(getMaiorAbs(delta, snl->n) < snl->epsilon_1){
+    // Verifica critério de parada pelo delta
+    if(getMaiorAbs(delta, snl->n) < snl->epsilon){
       break;
     }
     
     iteracao++;
   }
+  adicionaTempoTotal((timestamp() - tempoTotal), dadosExec);
 
-  printf("Resultado ");
-  imprimeVetor(x, snl->n);
+  imprimeResultado(x, variaveis, tamanho, saida);
 
-  return NULL;
+  return dadosExec;
+}
+
+// ============ Funções para manipulação dos dados de execução ============
+
+DadosExecucao *inciaDadosExecucao (){
+  DadosExecucao *dados = malloc(sizeof(DadosExecucao));
+  dados->tempoJacobianas = 0.0;
+  dados->tempoSistemaLinear = 0.0;
+  dados->tempoTotal = 0.0;
+  dados->tempoDerivadas = 0.0;
+  return dados;
+}
+
+void adicionaTempoJacobiana(double tempo, DadosExecucao *dados){
+  if(dados == NULL || dados->tempoJacobianas < 0){
+    fprintf(stderr, "Dados de execução não incializados\n");
+    return;
+  }
+
+  dados->tempoJacobianas += tempo;
+}
+
+void adicionaTempoDerivadas(double tempo, DadosExecucao *dados){
+  if(dados == NULL || dados->tempoDerivadas < 0){
+    fprintf(stderr, "Dados de execução não incializados\n");
+    return;
+  }
+  
+  dados->tempoDerivadas += tempo;
+}
+
+void adicionaTempoSistemaLinear(double tempo, DadosExecucao *dados){
+  if(dados == NULL || dados->tempoSistemaLinear < 0){
+    fprintf(stderr, "Dados de execução não incializados\n");
+    return;
+  }
+  
+  dados->tempoSistemaLinear += tempo;
+}
+
+void adicionaTempoTotal(double tempo, DadosExecucao *dados){
+  if(dados == NULL || dados->tempoTotal < 0){
+    fprintf(stderr, "Dados de execução não incializados\n");
+    return;
+  }
+  
+  dados->tempoTotal += tempo;
 }

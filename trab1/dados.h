@@ -28,8 +28,7 @@ typedef struct {
   void **F; // Sistema não linear
   void ***Jacobiana; // Matriz jacobiana
   double *aprox_inicial; // Aproximação inicial
-  double epsilon_1; // epsilon X
-  double epsilon_2; // epsilon Y
+  double epsilon; // epsilon
   int max_iter; // número máximo de iterações
   int n; // Tamanho do sistema linear
 } SNL;
@@ -39,13 +38,5 @@ char *recebeNomeArquivoSaida(int argc, char *argv[]);
 void novoSnl(SNL *snl, int tamanho);
 
 double iniciaSnlEntrada(SNL *snl);
-
-void imprimeSNL(FILE *arqOut, SNL *snl);
-
-// int fimDaEntrada();
-
-// void imprimeResultado(char *nomeArquivoSaida);
-
-// void imprimeTempos(char *nomeArquivoSaida);
 
 #endif
