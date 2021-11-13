@@ -5,7 +5,6 @@
 *   Iago Mello Floriano - GRR:20196049 - imf19@inf.ufpr.br
 *   Gustavo H. da S. Barbosa - GRR:20190485 - ghsb19@inf.ufpr.br 
 * 
-* Dados: Define estrutura de dados utlizada, bem como métodos de leitura de entrada e escrita da saída
 ************/
 
 #ifndef __DADOS__

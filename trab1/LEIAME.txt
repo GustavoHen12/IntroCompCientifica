@@ -2,3 +2,30 @@ Nome:                     |  GRR:          |  Login do dinf:
 Iago Mello Floriano       |  GRR:20196049  |  imf19@inf.ufpr.br
 Gustavo H. da S. Barbosa  |  GRR:20190485  |  ghsb19@inf.ufpr.br
 
+Execução:
+  Para execução do programa basta executar:
+    > make
+    > ./newtonSNL -o arquivoSaida.out < entrada.in
+
+Modulos:
+  Dados:
+    Neste módulo esta definido a estrutura de dados principal, a SNL, ou seja, sistema não linear, bem como as funções que permitem manipular esses dados.
+    A estrutura de dados SNL armazena: as funções do sistema não linear, a matriz jacobiana, aproximação inicial, valor do epsilon, número máximo de iterações e tamanho do sistema linear.
+
+  Linear:
+    A principal função deste modulo é calcular o sistema linear pelo método de gauss com pivoteamente. Sendo que "calculculaSistemaLinear" é a principal função deste modulo.
+    É importante ressaltar que este módulo não é utilizado pelo principal, apenas pelo "newton" para o cálculo do sistema linear.
+
+  Newton:
+    Este modulo utiliza os dois anteriores para o cálculo do sistema não linear. Sendo que, para esse calculo, ele disponibila a função "calculaSNL".
+    Além disso, este módulo também disponibiliza uma estrutura de dados onde será armazenado os dados de execução, ou seja, os tempos. Assim, é disponibilizado funções que permitem manipular esses dados, e outra para realizar a impressão do mesmo.
+
+  Main:
+    Módulo principal, responsável por chamar as funções dos demais métodos, de forma que o seguinte fluxo é respeitado:
+      
+      enquanto houver uma entrada:
+        leia o sistema não linear.
+        calcule este sistema.
+        imprima os tempos.
+    
+    Observe que o módulo responsável pela primeira parte, ou seja, ler a entrada e criar o sistema não linear, é o de dados. Já o responsável por calcular e expor os resultados é o módulo "newton".
