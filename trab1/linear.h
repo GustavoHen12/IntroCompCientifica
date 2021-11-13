@@ -1,3 +1,12 @@
+/************
+* CI1164-Trabalho 1
+*
+* Autores:
+*   Iago Mello Floriano - GRR:20196049 - imf19@inf.ufpr.br
+*   Gustavo H. da S. Barbosa - GRR:20190485 - ghsb19@inf.ufpr.br 
+* 
+************/
+
 #ifndef __LINEAR__
 #define __LINEAR__
 

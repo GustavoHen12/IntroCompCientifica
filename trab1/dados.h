@@ -33,10 +33,25 @@ typedef struct {
   int n; // Tamanho do sistema linear
 } SNL;
 
+// Le opções de entrada e retorna o nome do arquivo de saída
+// Se não tiver nenhuma opção retorna NULL
 char *recebeNomeArquivoSaida(int argc, char *argv[]);
 
+// Abre arquivo de entrada e retorna ponteiro para arquivo
+// Se nenhum arquivo for selecionado retorna stdout
+FILE *abreEntrada(int argc, char *argv[]);
+
+// Cria um novo snl, que possui tamanho "tamanho"
+// Todas as alocações são realizados dentro da função
 void novoSnl(SNL *snl, int tamanho);
 
+// A partir de um sistema não linear já inicializado "snl"
+// Le valores da entrada padrão e inicia SNL
+// O valor de retorno corresponde ao tempo para o 
+// calculo das derivadas da matriz Jacobiana
 double iniciaSnlEntrada(SNL *snl);
+
+// Finaliza funções e desaloca dados do SNL
+void encerraSNL(SNL *snl);
 
 #endif

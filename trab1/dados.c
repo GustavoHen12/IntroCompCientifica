@@ -30,19 +30,40 @@ void novoSnl(SNL *snl, int tamanho) {
     return;
   }
 
+  // Inicia variaveis
   snl->n = tamanho;
-  //Realiza alocações
-  snl->F = malloc(sizeof(void *) * tamanho);
-  if(!snl->F) fprintf(stderr, "erro ao alocar f\n");
-  snl->Jacobiana = malloc(sizeof(void **) * tamanho);
-  if(!snl->Jacobiana) fprintf(stderr, "erro ao alocar j\n");
-  for (int i = 0; i < tamanho; i++) {
-    snl->Jacobiana[i] = malloc(sizeof(void *) * tamanho);
-    if(!snl->Jacobiana[i]) fprintf(stderr, "erro ao alocar J[%d]\n", i);
-  }
-  snl->aprox_inicial = malloc(sizeof(double) * tamanho);
   snl->epsilon = 0.0;
   snl->max_iter = 0;
+
+  //Realiza alocações
+  // Aloca matriz para funções do sistema não linear
+  snl->F = malloc(sizeof(void *) * tamanho);
+  if(!snl->F)
+    fprintf(stderr, "erro ao alocar f\n");
+  
+  // Aloca matriz para jacobiana
+  // cada elemento da matriz corresponde a uma função (derivada parcial) 
+  snl->Jacobiana = malloc(sizeof(void **) * tamanho);
+  if(!snl->Jacobiana)
+    fprintf(stderr, "erro ao alocar j\n");
+  for (int i = 0; i < tamanho; i++) {
+    snl->Jacobiana[i] = malloc(sizeof(void *) * tamanho);
+    if(!snl->Jacobiana[i])
+      fprintf(stderr, "erro ao alocar J[%d]\n", i);
+  }
+
+  // Aloca vetor para aproximação inicial
+  snl->aprox_inicial = malloc(sizeof(double) * tamanho);
+  if(!snl->aprox_inicial)
+      fprintf(stderr, "erro ao alocar vetor para aproximação inicial\n");
+}
+
+FILE *abreEntrada(int argc, char *argv[]){
+  char *nomeArquivoSaida = recebeNomeArquivoSaida(argc, argv);
+  FILE *arqOut = fopen(nomeArquivoSaida, "w");
+  if (!arqOut)
+    arqOut = stdout;
+  return (arqOut);
 }
 
 // A partir da funcão de entrada do sistema não linear
@@ -94,37 +115,28 @@ double iniciaSnlEntrada(SNL *snl) {
   return tempoDerivadas;
 }
 
-// void imprimeSNL(FILE *arqOut, SNL *snl) {
-//   fprintf(arqOut, "SNL[%d]: \n", snl->n);
-//   fflush(arqOut);
+void encerraSNL(SNL *snl) {
+  int tamanho = snl->n;
 
-//   int tamanho = snl->n;
-//   // Matriz do sistema não linear
-//   /* Print variable names appearing in function. */
-//   fprintf(arqOut, "sistema:\n");
-//   for (int i = 0; i < tamanho; i++) {
-//     fprintf(arqOut, "%s \n", evaluator_get_string(snl->F[i]));
-//   }
+  // Destroi funções e libera matriz do SNL 
+  for (int i = 0; i < tamanho; i++) {
+    evaluator_destroy (snl->F[i]);
+  }
+  free(snl->F);
 
-//   //Imprimir da jacobiana REMOVER DEPOIS
-//   fprintf(arqOut, "Jacobiana:\n");
-//   for(int i = 0; i < tamanho; i++){
-//     fprintf(arqOut, "\tLinha %d:\n", i);
-//     for(int j = 0; j < tamanho; j++){
-//       fprintf(arqOut, "\t\t%s \n", evaluator_get_string(snl->Jacobiana[i][j]));
-//     }
-//   }
+  // Libera aproximação inicial
+  free(snl->aprox_inicial);
 
-//   // Aproximação inicial
-//   fprintf(arqOut, "X0:");
-//   for (int i = 0; i < tamanho; i++) {
-//     fprintf(arqOut, " %le ", snl->aprox_inicial[i]);
-//   }
-//   fprintf(arqOut, "\n");
+  // Destroi e libera matriz jacobiana
+  for(int i = 0; i < tamanho; i++){
+    for(int j = 0; j < tamanho; j++){
+      evaluator_destroy (snl->Jacobiana[i][j]);
+    }
+  }
+  free(snl->Jacobiana);
 
-//   // Epsilon
-//   fprintf(arqOut, "epsilon: %0.6f\n", snl->epsilon_1);
-
-//   // Maximo de iterações
-//   fprintf(arqOut, "maxIter: %d\n", snl->max_iter);
-// }
+  // Libera variaveis
+  snl->epsilon = 0;
+  snl->max_iter = 0;
+  snl->n = 0;
+}

@@ -1,8 +1,9 @@
 /************
 * CI1164-Trabalho 1
 *
-* Iago Mello Floriano - GRR:20196049 - imf19@inf.ufpr.br
-* Gustavo H. da S. Barbosa - GRR:20190485 - ghsb19@inf.ufpr.br 
+* Autores:
+*   Iago Mello Floriano - GRR:20196049 - imf19@inf.ufpr.br
+*   Gustavo H. da S. Barbosa - GRR:20190485 - ghsb19@inf.ufpr.br 
 * 
 ************/
 
@@ -52,7 +53,7 @@ void imprimeInicio(void **F, int num, FILE *saida){
 void imprimeResultado(double *vet, char **variaveis, int tamanho, FILE *saida) {
   fprintf(saida, "#\n");
   for(int i = 0; i < tamanho; i++){
-    fprintf(saida, "%s = %0.6f \n", variaveis[i], vet[i]);
+    fprintf(saida, "%s = %0.6f\n", variaveis[i], vet[i]);
   }
 }
 
@@ -161,10 +162,6 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
   int iteracao = 0;
   tempoTotal = timestamp();
   while (iteracao < snl->max_iter) {
-
-    // Imprime resultado parcial encontrado na iteracao anterior    
-    imprimeResultado(x, variaveis, tamanho, saida);
-
     // Calculo do delta
     // Montar sistema linear
     tempoJacobiana = timestamp();
@@ -177,6 +174,9 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
     if(getMaiorAbs(termosIndependentes, snl->n) < snl->epsilon){
       break;
     }
+
+    // Imprime resultado parcial encontrado na iteracao anterior    
+    imprimeResultado(x, variaveis, tamanho, saida);
 
     // Calcular sistema linear
     tempoSL = timestamp();
