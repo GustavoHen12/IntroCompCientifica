@@ -43,6 +43,12 @@ double aplicaFuncao(void *func, double *x, int tamanho){
 
 // ============ Impressão da saída ============
 
+void imprimeInicio(void **F, int num, FILE *saida){
+  fprintf(saida, "%d\n", num);
+  for (int i = 0; i < num; i++)
+    fprintf(saida, "%s\n", evaluator_get_string(F[i]));
+}
+
 void imprimeResultado(double *vet, char **variaveis, int tamanho, FILE *saida) {
   fprintf(saida, "#\n");
   for(int i = 0; i < tamanho; i++){
@@ -56,7 +62,7 @@ void imprimeDadosExecucao(DadosExecucao *dados, FILE *saida) {
   fprintf(saida, "# Tempo Derivadas: %0.6f\n", dados->tempoDerivadas);
   fprintf(saida, "# Tempo Jacobiana: %0.6f\n", dados->tempoJacobianas);
   fprintf(saida, "# Tempo SL: %0.6f\n", dados->tempoSistemaLinear);
-  fprintf(saida, "###########\n");
+  fprintf(saida, "###########\n\n");
 
 }
 
@@ -140,6 +146,9 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
     variaveis[i] = malloc(sizeof(char *) * tamanho);
     sprintf(variaveis[i], "x%d", i+1);
   }
+
+  // Imprime saída inicial desse sistema
+  imprimeInicio(snl->F, tamanho, saida);
 
 
   // Variaveis para pegar os tempos
