@@ -33,12 +33,12 @@ void novoSnl(SNL *snl, int tamanho) {
   snl->n = tamanho;
   //Realiza alocações
   snl->F = malloc(sizeof(void *) * tamanho);
-  if(!snl->F) printf("erro ao alocar f\n");
+  if(!snl->F) fprintf(stderr, "erro ao alocar f\n");
   snl->Jacobiana = malloc(sizeof(void **) * tamanho);
-  if(!snl->Jacobiana) printf("erro ao alocar j\n");
+  if(!snl->Jacobiana) fprintf(stderr, "erro ao alocar j\n");
   for (int i = 0; i < tamanho; i++) {
     snl->Jacobiana[i] = malloc(sizeof(void *) * tamanho);
-    if(!snl->Jacobiana[i]) printf("erro ao alocar J[%d]\n", i);
+    if(!snl->Jacobiana[i]) fprintf(stderr, "erro ao alocar J[%d]\n", i);
   }
   snl->aprox_inicial = malloc(sizeof(double) * tamanho);
   snl->epsilon = 0.0;
@@ -57,12 +57,9 @@ void calculaJacobiana(SNL *snl) {
   }
   for (int i = 0; i < tamanho; i++) {
     void *funcAtual = snl->F[i]; //Salvar função para derivar
-    printf("\t\t %s:\n", evaluator_get_string(funcAtual));
     for (int j = 0; j < tamanho; j++) {
       snl->Jacobiana[i][j] = evaluator_derivative(funcAtual, names[j]);
-      printf("\t\t\t %s : %d\n", evaluator_get_string(snl->Jacobiana[i][j]), j+1);
     }
-    printf("-----------------------\n");
   }
 }
 
