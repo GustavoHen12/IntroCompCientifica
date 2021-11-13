@@ -27,7 +27,7 @@ double  *calculculaSistemaLinear(double **sistema, double *termos_independentes,
 void pivoteia(double **sistema, double *termos_independentes, int *transformacoes, int n, int tam){
   int max = n; // Valor para salvar o índice da linha com maior enésimo elemento
   for(int i = n; i < tam; i++)
-    if (sistema[i][n] > sistema[max][n]) max = i;
+    if (fabs(sistema[i][n]) > fabs(sistema[max][n])) max = i;
 
   // modifica vetor de transformacoes
   int temp = transformacoes[max];

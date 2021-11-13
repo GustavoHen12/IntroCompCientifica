@@ -2,6 +2,7 @@
 #define __LINEAR__
 
 #include <stdlib.h>
+#include <math.h>
 
 double  *calculculaSistemaLinear(double **sistema, double *termos_independentes, int tam);
 
