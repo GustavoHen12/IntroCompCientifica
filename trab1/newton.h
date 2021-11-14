@@ -31,7 +31,7 @@ void imprimeDadosExecucao(DadosExecucao *dados, FILE *saida);
 
 // Retorna um ponteiro para uma nova estrutura 
 // com os tempos de execução zerados
-DadosExecucao *inciaDadosExecucao ();
+DadosExecucao *iniciaDadosExecucao ();
 
 // Cada uma das funções abaixo adicionam o tempo "tempo"
 // aos dados de execução, se os dados não foram inicializados
@@ -43,5 +43,7 @@ void adicionaTempoDerivadas(double tempo, DadosExecucao *dados);
 void adicionaTempoSistemaLinear(double tempo, DadosExecucao *dados);
 
 void adicionaTempoTotal(double tempo, DadosExecucao *dados);
+
+void encerraDadosExecucao(DadosExecucao *dados);
 
 #endif

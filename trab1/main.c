@@ -28,5 +28,7 @@ int main(int argc, char *argv[]){
     imprimeDadosExecucao(dadosExecucao, arqOut);
 
     encerraSNL(&snl);
+    encerraDadosExecucao(dadosExecucao);
   }
+ fclose(arqOut);
 }

@@ -38,7 +38,13 @@ double aplicaFuncao(void *func, double *x, int tamanho){
     variaveis[i] = malloc(sizeof(char *) * tamanho);
     sprintf(variaveis[i], "x%d", i+1);
   }
-  return evaluator_evaluate(func, tamanho, variaveis, x);
+  double resultado = evaluator_evaluate(func, tamanho, variaveis, x);
+
+  for (int i = 0; i < tamanho; i++)
+    free(variaveis[i]);
+  free(variaveis);
+
+  return resultado;
 }
 
 
@@ -81,6 +87,11 @@ double *criaVetor(int tamanho){
   return vet;
 }
 
+// Desaloca o espaço ocupado pelo vetor vet
+void destroiVetor(double *vet){
+  free(vet);
+}
+
 // Cria matriz de "colunas" x "linhas"
 // Se ocorrer algum erro, retorna NULL
 double **criaMatriz(int colunas, int linhas){
@@ -94,6 +105,13 @@ double **criaMatriz(int colunas, int linhas){
     mat[i] = malloc (colunas * sizeof (double));
 
   return mat;
+}
+
+void destroiMatriz(double **mat, int colunas){
+  for (int i = 0; i < colunas; i++){
+    free(mat[i]);
+  }
+  free(mat);
 }
 
 // Copia um vetor A em um vetor B
@@ -153,10 +171,10 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
 
 
   // Variaveis para pegar os tempos
-  DadosExecucao *dadosExec = inciaDadosExecucao();
+  DadosExecucao *dadosExec = iniciaDadosExecucao();
   double tempoTotal, tempoJacobiana, tempoSL;
 
-  // Copia vetor da aproximação incial para o com o valor de X
+  // Copia vetor da aproximação inicial para o com o valor de X
   copiaVetor(snl->aprox_inicial, x, snl->n);
 
   int iteracao = 0;
@@ -190,8 +208,10 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
 
     // Verifica critério de parada pelo delta
     if(getMaiorAbs(delta, snl->n) < snl->epsilon){
+      free(delta);
       break;
     }
+    free(delta);
     
     iteracao++;
   }
@@ -199,12 +219,21 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
 
   imprimeResultado(x, variaveis, tamanho, saida);
 
+  // Desalocação de espaço na memória
+  destroiVetor(x);
+  destroiVetor(termosIndependentes);
+  destroiMatriz(tempJacobiana, snl->n);
+  for (int i = 0; i < snl->n; i++){
+    free(variaveis[i]);
+  }
+  free(variaveis);
+
   return dadosExec;
 }
 
 // ============ Funções para manipulação dos dados de execução ============
 
-DadosExecucao *inciaDadosExecucao (){
+DadosExecucao *iniciaDadosExecucao (){
   DadosExecucao *dados = malloc(sizeof(DadosExecucao));
   dados->tempoJacobianas = 0.0;
   dados->tempoSistemaLinear = 0.0;
@@ -215,7 +244,7 @@ DadosExecucao *inciaDadosExecucao (){
 
 void adicionaTempoJacobiana(double tempo, DadosExecucao *dados){
   if(dados == NULL || dados->tempoJacobianas < 0){
-    fprintf(stderr, "Dados de execução não incializados\n");
+    fprintf(stderr, "Dados de execução não inicializados\n");
     return;
   }
 
@@ -224,7 +253,7 @@ void adicionaTempoJacobiana(double tempo, DadosExecucao *dados){
 
 void adicionaTempoDerivadas(double tempo, DadosExecucao *dados){
   if(dados == NULL || dados->tempoDerivadas < 0){
-    fprintf(stderr, "Dados de execução não incializados\n");
+    fprintf(stderr, "Dados de execução não inicializados\n");
     return;
   }
   
@@ -233,7 +262,7 @@ void adicionaTempoDerivadas(double tempo, DadosExecucao *dados){
 
 void adicionaTempoSistemaLinear(double tempo, DadosExecucao *dados){
   if(dados == NULL || dados->tempoSistemaLinear < 0){
-    fprintf(stderr, "Dados de execução não incializados\n");
+    fprintf(stderr, "Dados de execução não inicializados\n");
     return;
   }
   
@@ -242,9 +271,14 @@ void adicionaTempoSistemaLinear(double tempo, DadosExecucao *dados){
 
 void adicionaTempoTotal(double tempo, DadosExecucao *dados){
   if(dados == NULL || dados->tempoTotal < 0){
-    fprintf(stderr, "Dados de execução não incializados\n");
+    fprintf(stderr, "Dados de execução não inicializados\n");
     return;
   }
   
   dados->tempoTotal += tempo;
+}
+
+// função para dar free no dados execução
+void encerraDadosExecucao(DadosExecucao *dados){
+  free(dados);
 }

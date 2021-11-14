@@ -15,8 +15,10 @@ char *recebeNomeArquivoSaida (int argc, char *argv[]) {
   int option;
   while ((option = getopt(argc, argv, "o:")) != -1) {
     if (option == 'o') {
+      free(filename);
       filename = optarg;
     } else {
+      free(filename);
       fprintf(stderr, "Nenhum arquivo para escrita especificado, usando saída padrão (stdout)\n");
       return NULL;
     }
@@ -72,16 +74,23 @@ void calculaJacobiana(SNL *snl) {
   int tamanho = snl->n;
   char **names;
   names = malloc(sizeof(char **) * tamanho);
+
   for (int i = 0; i < tamanho; i++){
     names[i] = malloc(sizeof(char *) * tamanho);
     sprintf(names[i], "x%d", i+1);
   }
+
   for (int i = 0; i < tamanho; i++) {
     void *funcAtual = snl->F[i]; //Salvar função para derivar
     for (int j = 0; j < tamanho; j++) {
       snl->Jacobiana[i][j] = evaluator_derivative(funcAtual, names[j]);
     }
   }
+
+  // Desalocação da memória
+  for (int i = 0; i < tamanho; i++)
+    free(names[i]);
+  free(names);
 }
 
 double iniciaSnlEntrada(SNL *snl) {
@@ -132,6 +141,7 @@ void encerraSNL(SNL *snl) {
     for(int j = 0; j < tamanho; j++){
       evaluator_destroy (snl->Jacobiana[i][j]);
     }
+    free(snl->Jacobiana[i]);
   }
   free(snl->Jacobiana);
 

@@ -31,6 +31,7 @@ double  *calculculaSistemaLinear(double **sistema, double *termos_independentes,
 
   // Despivoteia o sistema inteiro para retornar as variáveis corretas
   despivoteia(sistema, termos_independentes, transformacoes, variaveis, tam);
+  free(transformacoes);
 
   return variaveis;
 }
