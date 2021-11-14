@@ -1,8 +1,10 @@
-*
+*.o
+newtonSNL
 .vscode
 !*.txt
 !*.in
 !*.out
 !*.c
 !*.h
+!*.zip
 !Makefile

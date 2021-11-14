@@ -17,9 +17,9 @@ x2 = 3.002653
 x1 = -0.000002
 x2 = 3.000002
 ###########
-# Tempo Total: 0.042969
-# Tempo Derivadas: 0.010986
-# Tempo Jacobiana: 0.011719
+# Tempo Total: 0.034912
+# Tempo Derivadas: 0.008057
+# Tempo Jacobiana: 0.008789
 # Tempo SL: 0.001953
 ###########
 
@@ -45,10 +45,10 @@ x2 = 0.865972
 x1 = -1.817692
 x2 = 0.838026
 ###########
-# Tempo Total: 0.025146
-# Tempo Derivadas: 0.005859
-# Tempo Jacobiana: 0.011963
-# Tempo SL: 0.002197
+# Tempo Total: 0.020996
+# Tempo Derivadas: 0.005127
+# Tempo Jacobiana: 0.009033
+# Tempo SL: 0.000977
 ###########
 
 3
@@ -100,10 +100,10 @@ x1 = 0.785197
 x2 = 0.496611
 x3 = 0.369923
 ###########
-# Tempo Total: 0.116943
-# Tempo Derivadas: 0.022949
-# Tempo Jacobiana: 0.071045
-# Tempo SL: 0.006104
+# Tempo Total: 0.131836
+# Tempo Derivadas: 0.020996
+# Tempo Jacobiana: 0.087891
+# Tempo SL: 0.002930
 ###########
 
 10
@@ -162,9 +162,9 @@ x8 = -0.665809
 x9 = -0.596055
 x10 = -0.416431
 ###########
-# Tempo Total: 1.084961
-# Tempo Derivadas: 0.212891
-# Tempo Jacobiana: 0.960205
-# Tempo SL: 0.012939
+# Tempo Total: 0.766113
+# Tempo Derivadas: 0.230957
+# Tempo Jacobiana: 0.671143
+# Tempo SL: 0.010742
 ###########
 
