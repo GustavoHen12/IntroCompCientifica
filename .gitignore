@@ -1,4 +1,5 @@
 *.o
+out_*
 newtonSNL
 .vscode
 !*.txt
@@ -8,3 +9,6 @@ newtonSNL
 !*.h
 !*.zip
 !Makefile
+*.sistema
+geraSL
+gaussJacobi-likwid
