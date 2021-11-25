@@ -5,20 +5,19 @@ DIR_INICIAL="$PWD"
 SRC="$PWD/sistema"
 cd $SRC
 echo "Rodando Make"
-make
-make geraSL
+make geraSL likwid
 cd $DIR_INICIAL
 
 ENTRADAS="$SRC/entradas-sistema"
 [[ -d $ENTRADAS ]] ||  mkdir -p $ENTRADAS
+
+SAIDAS="$SRC/saidas-sistema"
+[[ -d $SAIDAS ]] || mkdir -p $SAIDAS
+cd $SAIDAS
 
 echo "Gerando Sistemas e Resultados"
 for i in "${TAMANHOS_TESTE[@]}"; do
   $SRC/geraSL $i > $ENTRADAS/$i.sistema
   $SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema
 done
-
-echo "Movendo Saidas"
-SAIDAS="$SRC/saidas-sistema"
-[[ -d $SAIDAS ]] || mkdir -p $SAIDAS
-mv out_* $SAIDAS
+cd $DIR_INICIAL
