@@ -1,0 +1,8 @@
+Nome:                     |  GRR:          |  Login do dinf:
+Iago Mello Floriano       |  GRR:20196049  |  imf19@inf.ufpr.br
+Gustavo H. da S. Barbosa  |  GRR:20190485  |  ghsb19@inf.ufpr.br
+
+Otimizações em gaussJacobiOpt:
+    Alocação da matriz foi feita para melhor uso do cache. No código não otimizado era feito um malloc para cada linha, já no código otimizado fio feito apenas um malloc com o tamanho total de elementos da matriz.
+    O tamanho de cada alocação foi melhorado para evitar potências de dois. Quando se nota que seria feito uma alocação usando um "n" que é uma potência de dois é na verdade usado "n+1" para a alocação.
+    Foi feito loop unrolling no método. Como o método é iterativo e o mesmo valor do vetor "x" é utilizado varias vezes, com o loop unrolling o mesmo valor é utilizado 4 vezes em um único loop.
