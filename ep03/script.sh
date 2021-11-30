@@ -35,7 +35,7 @@ echo 'Tamanho, naoOpt, opt' > $SAIDAS_CSV/L2CACHE.csv
 touch $SAIDAS_CSV/FLOPS_DP.csv
 echo 'Tamanho, dp_naoOpt, avx_naoOpt, dp_opt, avx_opt' > $SAIDAS_CSV/FLOPS_DP.csv
 touch $SAIDAS_CSV/TIME.csv
-echo 'Tamanho, naoOpt, opt' > $SAIDAS_CSV/FLOPS_DP.csv
+echo 'Tamanho, naoOpt, opt' > $SAIDAS_CSV/TIME.csv
 
 echo "Gerando Sistemas, Resultados e Fazendo o benchmark"
 SAIDALIKWID="$SRC/saida-likwid"
