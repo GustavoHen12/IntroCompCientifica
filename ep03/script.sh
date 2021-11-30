@@ -6,9 +6,7 @@ DIR_INICIAL="$PWD"
 SRC="$PWD/sistema"
 cd $SRC
 echo "Rodando Make"
-make geraSL likwid
-cd $DIR_INICIAL
-make geraSL likwid
+make geraSL avx
 cd $DIR_INICIAL
 
 ENTRADAS="$SRC/entradas-sistema"
