@@ -1,6 +1,8 @@
 *.o
 out_*
 *.likwid
+*.png
+*.csv
 newtonSNL
 .vscode
 !*.txt
