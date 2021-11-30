@@ -1,5 +1,6 @@
 *.o
 out_*
+*.likwid
 newtonSNL
 .vscode
 !*.txt

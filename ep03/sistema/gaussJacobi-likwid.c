@@ -8,6 +8,7 @@
 #include "libGaussJacobi.h"
 
 int main(int argc, char ** argv) {
+  LIKWID_MARKER_INIT;
 
   if (argc < 2) {
     printf("uso: %s file_in\n\n", argv[0]);
@@ -22,15 +23,20 @@ int main(int argc, char ** argv) {
   FILE *f_out;
 
   f_out = fopen(markerName("out_gaussJacobi", n), "w");
+  LIKWID_MARKER_START("naoOpt");
   gaussJacobi(f_in, f_out);
+  LIKWID_MARKER_STOP("naoOpt");
   fclose(f_out);
   rewind(f_in);
 
   f_out = fopen(markerName("out_gaussJacobiOpt", n), "w");
+  LIKWID_MARKER_START("opt");
   gaussJacobiOpt(f_in, f_out);
+  LIKWID_MARKER_STOP("opt");
   fclose(f_out);
   fclose(f_in);
 
+  LIKWID_MARKER_CLOSE;
   return 0;
 }
 

@@ -15,9 +15,13 @@ SAIDAS="$SRC/saidas-sistema"
 [[ -d $SAIDAS ]] || mkdir -p $SAIDAS
 cd $SAIDAS
 
-echo "Gerando Sistemas e Resultados"
+echo "Gerando Sistemas, Resultados e Fazendo o benchmark"
+SAIDALIKWID="$SRC/saida-likwid"
+[[ -d $SAIDALIKWID ]] || mkdir -p $SAIDALIKWID
 for i in "${TAMANHOS_TESTE[@]}"; do
   $SRC/geraSL $i > $ENTRADAS/$i.sistema
-  $SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema
+  likwid-perfctr -C 3 -g L3       -o $SAIDALIKWID/${i}L3.likwid       -m $SRC/gaussJacobi-likwid $ENTRADAS100.sistema
+  likwid-perfctr -C 3 -g L2CACHE  -o $SAIDALIKWID/${i}L2CACHE.likwid  -m $SRC/gaussJacobi-likwid $ENTRADAS100.sistema
+  likwid-perfctr -C 3 -g FLOPS_DP -o $SAIDALIKWID/${i}FLOPS_DP.likwid -m $SRC/gaussJacobi-likwid $ENTRADAS100.sistema
 done
 cd $DIR_INICIAL
