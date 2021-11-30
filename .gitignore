@@ -13,5 +13,6 @@ newtonSNL
 !*.zip
 !Makefile
 *.sistema
+*/sistema/saidas-csv/*
 geraSL
 gaussJacobi-likwid

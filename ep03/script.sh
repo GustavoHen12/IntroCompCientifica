@@ -38,12 +38,14 @@ echo 'Tamanho, naoOpt, opt' > $SAIDAS_CSV/TIME.csv
 echo "Gerando Sistemas, Resultados e Fazendo o benchmark"
 SAIDALIKWID="$SRC/saida-likwid"
 [[ -d $SAIDALIKWID ]] || mkdir -p $SAIDALIKWID
+echo "performance" > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor
 for i in "${TAMANHOS_TESTE[@]}"; do
   $SRC/geraSL $i > $ENTRADAS/$i.sistema
   likwid-perfctr -C 3 -g L3       -o $SAIDALIKWID/${i}L3.likwid       -m $SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema
   likwid-perfctr -C 3 -g L2CACHE  -o $SAIDALIKWID/${i}L2CACHE.likwid  -m $SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema
   likwid-perfctr -C 3 -g FLOPS_DP -o $SAIDALIKWID/${i}FLOPS_DP.likwid -m $SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema
-  #$SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema >> $SAIDAS_CSV/TIME.csv
+  
+  echo "$i, $($SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema)" >> $SAIDAS_CSV/TIME.csv
 
   # Formata saida para csv
   echo "$i, $(grep 'L3 bandwidth \[MBytes/s\]' $SAIDALIKWID/${i}L3.likwid |  grep -o -P '(?<=,).*(?=,)' | sed -z 's/\n/, /g;s/, $/\n/')" >> $SAIDAS_CSV/L3.csv
@@ -51,6 +53,7 @@ for i in "${TAMANHOS_TESTE[@]}"; do
   echo "$i, $(grep 'DP \[MFLOP/s\]' $SAIDALIKWID/${i}FLOPS_DP.likwid |  grep -o -P '(?<=,).*(?=,)' | sed -z 's/\n/, /g;s/, $/\n/')" >> $SAIDAS_CSV/FLOPS_DP.csv
 done
 cd $DIR_INICIAL
+echo "powersave" > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor 
 
 GRAFICOS="$DIR_INICIAL/graficos"
 [[ -d $GRAFICOS ]] || mkdir -p $GRAFICOS
@@ -88,4 +91,15 @@ plot "$SAIDAS_CSV/FLOPS_DP.csv" u 1:2 w lines smooth unique title 'dp-naoOpt', \
       "$SAIDAS_CSV/FLOPS_DP.csv" u 1:3 w lines smooth unique title 'avx-naoOpt', \
       "$SAIDAS_CSV/FLOPS_DP.csv" u 1:4 w lines smooth unique title 'dp-opt', \
       "$SAIDAS_CSV/FLOPS_DP.csv" u 1:5 w lines smooth unique title 'avx-opt'
+EOFMarker
+
+gnuplot -persist <<-EOFMarker
+set terminal png size 800,500 enhanced
+set output '$GRAFICOS/tempo.png'
+
+set xlabel "Tamanho"
+set ylabel "s"
+set title "Tempo"
+plot "$SAIDAS_CSV/TIME.csv" u 1:2 w lines smooth unique title 'naoOpt', \
+      "$SAIDAS_CSV/TIME.csv" u 1:3 w lines smooth unique title 'opt'
 EOFMarker

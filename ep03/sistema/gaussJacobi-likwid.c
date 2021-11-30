@@ -23,19 +23,24 @@ int main(int argc, char ** argv) {
   FILE *f_out;
 
   f_out = fopen(markerName("out_gaussJacobi", n), "w");
+  double tempoNaoOtimizado = timestamp();
   LIKWID_MARKER_START("naoOpt");
   gaussJacobi(f_in, f_out);
   LIKWID_MARKER_STOP("naoOpt");
+  tempoNaoOtimizado = timestamp() - tempoNaoOtimizado;
   fclose(f_out);
   rewind(f_in);
 
   f_out = fopen(markerName("out_gaussJacobiOpt", n), "w");
+  double tempoOtimizado = timestamp();
   LIKWID_MARKER_START("opt");
   gaussJacobiOpt(f_in, f_out);
+  tempoOtimizado = timestamp() - tempoOtimizado;
   LIKWID_MARKER_STOP("opt");
   fclose(f_out);
   fclose(f_in);
 
+  printf("%0.6f, %0.6f\n", tempoNaoOtimizado, tempoOtimizado);
   LIKWID_MARKER_CLOSE;
   return 0;
 }
