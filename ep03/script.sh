@@ -58,7 +58,7 @@ GRAFICOS="$DIR_INICIAL/graficos"
 [[ -d $GRAFICOS ]] || mkdir -p $GRAFICOS
 
 gnuplot -persist <<-EOFMarker
-set terminal png size 800,500 enhanced font "Helvetica,12"
+set terminal png size 800,500 enhanced
 set output '$GRAFICOS/memoryBandwith.png'
 
 set xlabel "Tamanho"
@@ -69,7 +69,7 @@ plot "$SAIDAS_CSV/L3.csv" u 1:2 w lines smooth unique title 'naoOpt', \
 EOFMarker
 
 gnuplot -persist <<-EOFMarker
-set terminal png size 800,500 enhanced font "Helvetica,12"
+set terminal png size 800,500 enhanced
 set output '$GRAFICOS/cacheMissRatio.png'
 
 set xlabel "Tamanho"
@@ -80,7 +80,7 @@ plot "$SAIDAS_CSV/L2CACHE.csv" u 1:2 w lines smooth unique title 'naoOpt', \
 EOFMarker
 
 gnuplot -persist <<-EOFMarker
-set terminal png size 800,500 enhanced font "Helvetica,12"
+set terminal png size 800,500 enhanced
 set output '$GRAFICOS/flops.png'
 
 set xlabel "Tamanho"
