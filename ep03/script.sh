@@ -53,54 +53,8 @@ for i in "${TAMANHOS_TESTE[@]}"; do
   echo "$i, $(grep 'DP \[MFLOP/s\]' $SAIDALIKWID/${i}FLOPS_DP.likwid |  grep -o -P '(?<=,).*(?=,)' | sed -z 's/\n/, /g;s/, $/\n/')" >> $SAIDAS_CSV/FLOPS_DP.csv
 done
 cd $DIR_INICIAL
+
 echo "powersave" > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor 
 
 GRAFICOS="$DIR_INICIAL/graficos"
 [[ -d $GRAFICOS ]] || mkdir -p $GRAFICOS
-
-gnuplot -persist <<-EOFMarker
-set terminal png size 800,500 enhanced
-set output '$GRAFICOS/memoryBandwith.png'
-
-set xlabel "Tamanho"
-set ylabel "MBytes/s"
-set title "L3 Memory bandwidth"
-plot "$SAIDAS_CSV/L3.csv" u 1:2 w lines smooth unique title 'naoOpt', \
-    "$SAIDAS_CSV/L3.csv" u 1:3 w lines smooth unique title 'opt'
-EOFMarker
-
-gnuplot -persist <<-EOFMarker
-set terminal png size 800,500 enhanced
-set output '$GRAFICOS/cacheMissRatio.png'
-
-set xlabel "Tamanho"
-set ylabel "Miss Ratio"
-set title "Data cache miss ratio"
-plot "$SAIDAS_CSV/L2CACHE.csv" u 1:2 w lines smooth unique title 'naoOpt', \
-      "$SAIDAS_CSV/L2CACHE.csv" u 1:3 w lines smooth unique title 'opt'
-EOFMarker
-
-gnuplot -persist <<-EOFMarker
-set terminal png size 800,500 enhanced
-set output '$GRAFICOS/flops.png'
-
-set xlabel "Tamanho"
-set ylabel "MFLOP/s"
-set title "Flops"
-plot "$SAIDAS_CSV/FLOPS_DP.csv" u 1:2 w lines smooth unique title 'dp-naoOpt', \
-      "$SAIDAS_CSV/FLOPS_DP.csv" u 1:3 w lines smooth unique title 'avx-naoOpt', \
-      "$SAIDAS_CSV/FLOPS_DP.csv" u 1:4 w lines smooth unique title 'dp-opt', \
-      "$SAIDAS_CSV/FLOPS_DP.csv" u 1:5 w lines smooth unique title 'avx-opt'
-EOFMarker
-
-gnuplot -persist <<-EOFMarker
-set terminal png size 800,500 enhanced
-set output '$GRAFICOS/tempo.png'
-
-set xlabel "Tamanho"
-set logscale y
-set ylabel "s"
-set title "Tempo"
-plot "$SAIDAS_CSV/TIME.csv" u 1:2 w lines smooth unique title 'naoOpt', \
-      "$SAIDAS_CSV/TIME.csv" u 1:3 w lines smooth unique title 'opt'
-EOFMarker
