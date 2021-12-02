@@ -1,6 +1,6 @@
 #!/bin/bash
 TAMANHOS_TESTE=( 10 32 50 64 100 128 200 250 256 300 400 512 600 1000 1024 2000 2048 3000 4096)
-#TAMANHOS_TESTE=( 10 32 50)
+# TAMANHOS_TESTE=( 10 32 50)
 DIR_INICIAL="$PWD"
 
 SRC="$PWD/sistema"
@@ -41,9 +41,9 @@ SAIDALIKWID="$SRC/saida-likwid"
 echo "performance" > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor
 for i in "${TAMANHOS_TESTE[@]}"; do
   $SRC/geraSL $i > $ENTRADAS/$i.sistema
-  likwid-perfctr -C 3 -g L3       -o $SAIDALIKWID/${i}L3.likwid       -m $SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema
-  likwid-perfctr -C 3 -g L2CACHE  -o $SAIDALIKWID/${i}L2CACHE.likwid  -m $SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema
-  likwid-perfctr -C 3 -g FLOPS_DP -o $SAIDALIKWID/${i}FLOPS_DP.likwid -m $SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema
+  likwid-perfctr -O -C 3 -g L3       -o $SAIDALIKWID/${i}L3.likwid       -m $SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema
+  likwid-perfctr -O -C 3 -g L2CACHE  -o $SAIDALIKWID/${i}L2CACHE.likwid  -m $SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema
+  likwid-perfctr -O -C 3 -g FLOPS_DP -o $SAIDALIKWID/${i}FLOPS_DP.likwid -m $SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema
   
   echo "$i, $($SRC/gaussJacobi-likwid $ENTRADAS/$i.sistema)" >> $SAIDAS_CSV/TIME.csv
 
@@ -98,6 +98,7 @@ set terminal png size 800,500 enhanced
 set output '$GRAFICOS/tempo.png'
 
 set xlabel "Tamanho"
+set logscale y
 set ylabel "s"
 set title "Tempo"
 plot "$SAIDAS_CSV/TIME.csv" u 1:2 w lines smooth unique title 'naoOpt', \
