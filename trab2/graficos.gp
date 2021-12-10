@@ -1,5 +1,5 @@
 #!/usr/bin/gnuplot -persist
-SAIDAS_CSV = GPVAL_PWD."/sistema/saida-csv"
+SAIDAS_CSV = GPVAL_PWD."/saida/csv"
 GRAFICOS = GPVAL_PWD."/graficos"
 
 set terminal png size 800,500 enhanced
