@@ -32,4 +32,24 @@ if [[ "$1" != "--nogen" ]]; then
   rm all.sistema
 fi
 
+# Execução dos códigos salvando os testes
+cd $THISDIR
+echo "Fazendo testes"
+for i in ${TAMANHOS_TESTE[@]}; do
+  echo "Executando testes para tamanho $(basename $i)"
+
+  # Teste para versão não otimizada
+  $SRCNOPT/newtonSNL -o $OUTNOPT/out_$i.txt < $ENTRADAS/$i.sistema
+  likwid-perfctr -O -C 3 -g L3       -o $OUTLIKWID/${i}NOPTL3.likwid       -m $SRCNOPT/newtonSNL -o /dev/null < $ENTRADAS/$i.sistema
+  likwid-perfctr -O -C 3 -g L2CACHE  -o $OUTLIKWID/${i}NOPTL2CACHE.likwid  -m $SRCNOPT/newtonSNL -o /dev/null < $ENTRADAS/$i.sistema
+  likwid-perfctr -O -C 3 -g FLOPS_DP -o $OUTLIKWID/${i}NOPTFLOPS_DP.likwid -m $SRCNOPT/newtonSNL -o /dev/null < $ENTRADAS/$i.sistema
+
+  # Teste para versão otimizada
+  $SRCOPT/newtonSNL -o $OUTOPT/out$i.txt < $ENTRADAS/$i.sistema
+  likwid-perfctr -O -C 3 -g L3       -o $OUTLIKWID/${i}OPTL3.likwid        -m $SRCOPT/newtonSNL -o /dev/null < $ENTRADAS/$i.sistema
+  likwid-perfctr -O -C 3 -g L2CACHE  -o $OUTLIKWID/${i}OPTL2CACHE.likwid   -m $SRCOPT/newtonSNL -o /dev/null < $ENTRADAS/$i.sistema
+  likwid-perfctr -O -C 3 -g FLOPS_DP -o $OUTLIKWID/${i}OPTFLOPS_DP.likwid  -m $SRCOPT/newtonSNL -o /dev/null < $ENTRADAS/$i.sistema
+done
+
+
 cd $DIRINICIAL
