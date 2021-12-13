@@ -178,12 +178,15 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
   copiaVetor(snl->aprox_inicial, x, snl->n);
 
   int iteracao = 0;
+  LIKWID_MARKER_START("MetodoNewton");
   tempoTotal = timestamp();
   while (iteracao < snl->max_iter) {
     // Calculo do delta
     // Montar sistema linear
     tempoJacobiana = timestamp();
+    LIKWID_MARKER_START("CalculaJacobiana");
     aplicaTermosJacobiana(snl->Jacobiana, x, snl->n, tempJacobiana);
+    LIKWID_MARKER_STOP("CalculaJacobiana");
     adicionaTempoJacobiana((timestamp() - tempoJacobiana), dadosExec);
 
     aplicaTermosMatriz(snl->F, x, snl->n, termosIndependentes);
@@ -193,13 +196,19 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
       break;
     }
 
+    LIKWID_MARKER_STOP("MetodoNewton");
     // Imprime resultado parcial encontrado na iteracao anterior    
+    adicionaTempoTotal((timestamp() - tempoTotal), dadosExec);
     imprimeResultado(x, variaveis, tamanho, saida);
+    tempoTotal = timestamp();
+    LIKWID_MARKER_START("MetodoNewton");
 
     // Calcular sistema linear
+    LIKWID_MARKER_START("SistemaLinear");
     tempoSL = timestamp();
     double  *delta = calculculaSistemaLinear(tempJacobiana, termosIndependentes, snl->n);
     adicionaTempoSistemaLinear((timestamp() - tempoSL), dadosExec);  
+    LIKWID_MARKER_STOP("SistemaLinear");
 
     // Calcula X_i+1
     for(int i = 0; i < snl->n; i++){
@@ -215,6 +224,7 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
     
     iteracao++;
   }
+  LIKWID_MARKER_STOP("MetodoNewton");
   adicionaTempoTotal((timestamp() - tempoTotal), dadosExec);
 
   imprimeResultado(x, variaveis, tamanho, saida);

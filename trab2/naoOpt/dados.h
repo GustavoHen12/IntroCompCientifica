@@ -19,6 +19,7 @@
 #include <getopt.h>
 #include <matheval.h>
 #include "utils.h"
+#include <likwid.h>
 
 #define STRING_SIZE 100
 #define INPUT_SIZE 256

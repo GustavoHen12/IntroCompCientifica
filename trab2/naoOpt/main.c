@@ -10,6 +10,7 @@
 #include "newton.h"
 
 int main(int argc, char *argv[]){
+  LIKWID_MARKER_INIT;
   FILE *arqOut = abreEntrada(argc, argv);
   SNL snl;
   int tamanho = 0;
@@ -31,4 +32,5 @@ int main(int argc, char *argv[]){
     encerraDadosExecucao(dadosExecucao);
   }
  fclose(arqOut);
+ LIKWID_MARKER_CLOSE;
 }

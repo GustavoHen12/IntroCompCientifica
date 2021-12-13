@@ -118,7 +118,9 @@ double iniciaSnlEntrada(SNL *snl) {
 
   double tempoDerivadas;
   tempoDerivadas = timestamp();
+  LIKWID_MARKER_START("GeracaoJacobiana");
   calculaJacobiana(snl);
+  LIKWID_MARKER_STOP("GeracaoJacobiana");
   tempoDerivadas = timestamp() - tempoDerivadas;
 
   return tempoDerivadas;

@@ -1,8 +1,14 @@
-CFLAGS = -Wall
-LDFLAGS = -lm
 DEBUG_FLAGS = -g
 COMPILER = -std=gnu99
 MATHEVAL_FLAGS = -lmatheval
+
+LIKWID = /home/soft/likwid
+LIKWID_FLAGS = -I$(LIKWID)/include -DLIKWID_PERFMON 
+LIKWID_LIBS = -L$(LIKWID)/lib -llikwid
+AVX_FLAGS = -O3 -mavx -march=native
+CFLAGS = $(LIKWID_FLAGS) $(AVX_FLAGS) 
+
+LDFLAGS = -lm $(LIKWID_LIBS)
 
 all: main
 
@@ -28,4 +34,4 @@ clean:
 	-rm -f *~ *.o
 	
 purge: clean
-	-rm -f ep02
+	-rm -f newtonSNL
