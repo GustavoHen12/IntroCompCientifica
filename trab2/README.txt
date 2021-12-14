@@ -1,10 +1,14 @@
 Organização:
 (naoOpt, opt) pasta para cada programa
 (saida)       pasta para as saidas, essa pasta contendo:
-  (likwid) pasta para todas as saidas do likwid
-  (csv)    pasta para os csvs que serão gerados
-  (opt)    pasta para a saída do programa otimizado
-  (naoOpt) pasta para a saída do programa nao otimizado
+  (opt)       pasta para as saídas do teste programa otimizado
+    (likwid)  pasta para a saída do likwid
+    (csv)     pasta para o csv com os dados desejados
+    (opt)     pasta para a saída do programa otimizado
+  (naoOpt)    pasta para as saídas do teste programa não otimizado
+    (likwid)  pasta para a saída do likwid
+    (csv)     pasta para o csv com os dados desejados
+    (naoOpt)  pasta para a saída do programa não otimizado
 (graficos)    pasta para salvar os graficos como png
 (entradas)    pasta que contém as entradas a serem usadas pelos programas
 (broyden.sh)  script que gera as entradas a serem usadas pelos programas
