@@ -72,25 +72,43 @@ FILE *abreEntrada(int argc, char *argv[]){
 // calcula a derivada parcial para cáculo da matriz jacobiana
 void calculaJacobiana(SNL *snl) {
   int tamanho = snl->n;
-  char **names;
-  names = malloc(sizeof(char **) * tamanho);
+  int m = 4;
 
-  for (int i = 0; i < tamanho; i++){
-    names[i] = malloc(sizeof(char *) * tamanho);
-    sprintf(names[i], "x%d", i+1);
-  }
-
-  for (int i = 0; i < tamanho; i++) {
-    void *funcAtual = snl->F[i]; //Salvar função para derivar
+  // Faz o loop Unroll & Jam
+  for (int i = 0; i < tamanho - (tamanho%m); i+=m) {
+    //Salvar função para derivar
+    void *funcAtual_1 = snl->F[i]; 
+    void *funcAtual_2 = snl->F[i+1];
+    void *funcAtual_3 = snl->F[i+2];
+    void *funcAtual_4 = snl->F[i+3];
+    
     for (int j = 0; j < tamanho; j++) {
-      snl->Jacobiana[i][j] = evaluator_derivative(funcAtual, names[j]);
+      snl->Jacobiana[i][j] = evaluator_derivative(funcAtual_1, snl->nomes_variaveis[j]);
+      snl->Jacobiana[i+1][j] = evaluator_derivative(funcAtual_2, snl->nomes_variaveis[j]);
+      snl->Jacobiana[i+2][j] = evaluator_derivative(funcAtual_3, snl->nomes_variaveis[j]);
+      snl->Jacobiana[i+3][j] = evaluator_derivative(funcAtual_4, snl->nomes_variaveis[j]);
     }
   }
 
-  // Desalocação da memória
-  for (int i = 0; i < tamanho; i++)
-    free(names[i]);
-  free(names);
+  for (int i = tamanho - (tamanho%m); i < tamanho; i++) {
+    void *funcAtual = snl->F[i]; //Salvar função para derivar
+    for (int j = 0; j < tamanho; j++) {
+      snl->Jacobiana[i][j] = evaluator_derivative(funcAtual, snl->nomes_variaveis[j]);
+    }
+  }
+}
+
+void **iniciaMatriz(int linhas, int colunas, int size){
+  void **mat = malloc (linhas * size);
+  if(mat == NULL){
+    fprintf(stderr, "Ocorreu um erro ao criar a matriz\n");
+    return NULL;
+  }
+
+  for (int i = 0; i < linhas; i++)
+    mat[i] = malloc (colunas * size);
+
+  return mat;
 }
 
 double iniciaSnlEntrada(SNL *snl) {
@@ -99,22 +117,36 @@ double iniciaSnlEntrada(SNL *snl) {
   // Matriz do sistema não linear
   for (int i = 0; i < tamanho; i++) {
     char funcaoStr[INPUT_SIZE];
-    scanf("%[^\t\n]s", funcaoStr);
+    if(scanf("%[^\t\n]s", funcaoStr) != 1){
+      fprintf(stderr, "Ocorreu um erro ao realizar a leitura da entrada\n");
+    }
     getchar();
     snl->F[i] = evaluator_create(funcaoStr);
   }
 
   // Aproximação inicial
   for (int i = 0; i < tamanho; i++) {
-    scanf("%le", &snl->aprox_inicial[i]);
+    if(scanf("%le", &snl->aprox_inicial[i]) != 1){
+      fprintf(stderr, "Ocorreu um erro ao realizar a leitura da entrada\n");
+    }
   }
 
   // Epsilon
-  scanf("%le", &snl->epsilon);
+  if(scanf("%le", &snl->epsilon) != 1){
+    fprintf(stderr, "Ocorreu um erro ao realizar a leitura da entrada\n");
+  }
 
   // Maximo de iterações
-  scanf("%d", &snl->max_iter);
+  if(scanf("%d", &snl->max_iter) != 1){
+    fprintf(stderr, "Ocorreu um erro ao realizar a leitura da entrada\n");
+  }
   getchar();
+
+  // Inicia nomes das variaveis
+  snl->nomes_variaveis = (char **) iniciaMatriz(tamanho, VARIABLE_NAME_SIZE, sizeof(char *));
+  for (int i = 0; i < tamanho; i++){
+    sprintf(snl->nomes_variaveis[i], "x%d", i+1);
+  }
 
   double tempoDerivadas;
   tempoDerivadas = timestamp();

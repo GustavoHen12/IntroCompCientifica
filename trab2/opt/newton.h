@@ -21,6 +21,8 @@ typedef struct {
   double tempoDerivadas;
 } DadosExecucao;
 
+#define UNROLL_SIZE 4
+
 // Função responsável por cacular o resultado do sistema não linear "snl"
 // através do método de newton. Os dados dos resultados parciais são
 // impressos no arquivo "saida"

@@ -22,6 +22,7 @@
 #include <likwid.h>
 
 #define STRING_SIZE 100
+#define VARIABLE_NAME_SIZE 6
 #define INPUT_SIZE 256
 
 typedef struct {
@@ -30,6 +31,7 @@ typedef struct {
   double *aprox_inicial; // Aproximação inicial
   double epsilon; // epsilon
   int max_iter; // número máximo de iterações
+  char **nomes_variaveis; // Vetor de string contendo os nomes das variaveis
   int n; // Tamanho do sistema linear
 } SNL;
 

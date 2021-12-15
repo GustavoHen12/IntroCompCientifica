@@ -21,32 +21,6 @@ double getMaiorAbs (double *vet, int n){
   return maior;
 }
 
-// ============ Funcões para manipulação da libmatheval ============
-
-// Aplica x_0, x_1, .., x_n em uma função f
-// sendo f = a_0*x_0 + a_1*x_1 + ... + a_n*x_n
-// Os valores de x, estão em ordem em x, e a função
-// corresponde a func. Retorna o valor resultante
-double aplicaFuncao(void *func, double *x, int tamanho){
-  if(func == NULL){
-    fprintf(stderr, "Ocorreu um erro ao calcular o valor\n");
-    return 0;
-  }
-  char **variaveis;
-  variaveis = malloc(sizeof(char **) * tamanho);
-  for (int i = 0; i < tamanho; i++){
-    variaveis[i] = malloc(sizeof(char *) * tamanho);
-    sprintf(variaveis[i], "x%d", i+1);
-  }
-  double resultado = evaluator_evaluate(func, tamanho, variaveis, x);
-
-  for (int i = 0; i < tamanho; i++)
-    free(variaveis[i]);
-  free(variaveis);
-
-  return resultado;
-}
-
 
 // ============ Impressão da saída ============
 
@@ -122,27 +96,24 @@ void copiaVetor(double *vetA, double *vetB, int tam){
   }
 }
 
+// ============ Funcões para manipulação da libmatheval ============
+
+// Aplica x_0, x_1, .., x_n em uma função f
+// sendo f = a_0*x_0 + a_1*x_1 + ... + a_n*x_n
+// Os valores de x, estão em ordem em x, e a função
+// corresponde a func. Retorna o valor resultante
+double aplicaFuncao(void *func, double *x, int tamanho, char **variaveis){
+  if(func == NULL){
+    fprintf(stderr, "Ocorreu um erro ao calcular o valor\n");
+    return 0;
+  }
+
+  double resultado = evaluator_evaluate(func, tamanho, variaveis, x);
+
+  return resultado;
+}
 
 // ============ Calculo SNL ============
-
-// Recebe a matriz jacobiana ("matriz") de tamanho "n"x"n" e os termos independentes
-// ("termos") e aplica. O resultado é colocado na matriz "resultado"
-void aplicaTermosJacobiana(void ***matriz, double *termos, int n, double **resultado) {
-  for(int i = 0; i < n; i++){
-    for(int j = 0; j < n; j++){
-      resultado[i][j] = aplicaFuncao(matriz[i][j], termos, n);
-    }
-  }
-}
-
-// Aplica os termos "termos", na matriz "matriz" de tamanho "n"x"n".]
-// O resultado de cada linha é colocado no vetor "resultado"
-void aplicaTermosMatriz(void **matriz, double *termos, int n, double *resultado) {
-  for(int i = 0; i < n; i++){
-      resultado[i] = aplicaFuncao(matriz[i], termos, n) * -1;
-  }
-}
-
 DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
   //verificar se SNL não é NULL
   if (snl == NULL || !(snl->n > 0)) {
@@ -159,12 +130,6 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
 
   // Pega os nomes da variaveis para impressão da saída parcial
   int tamanho = snl->n;
-  char **variaveis;
-  variaveis = malloc(sizeof(char **) * tamanho);
-  for (int i = 0; i < tamanho; i++){
-    variaveis[i] = malloc(sizeof(char *) * tamanho);
-    sprintf(variaveis[i], "x%d", i+1);
-  }
 
   // Imprime saída inicial desse sistema
   imprimeInicio(snl->F, tamanho, saida);
@@ -183,13 +148,41 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
   while (iteracao < snl->max_iter) {
     // Calculo do delta
     // Montar sistema linear
-    tempoJacobiana = timestamp();
-    LIKWID_MARKER_START("CalculaJacobiana");
-    aplicaTermosJacobiana(snl->Jacobiana, x, snl->n, tempJacobiana);
-    LIKWID_MARKER_STOP("CalculaJacobiana");
-    adicionaTempoJacobiana((timestamp() - tempoJacobiana), dadosExec);
+    for(int i = 0; i < tamanho - (tamanho%UNROLL_SIZE); i+=UNROLL_SIZE){
+      // Aplica termos jacobiana
+      LIKWID_MARKER_START("CalculaJacobiana");
+      tempoJacobiana = timestamp();
 
-    aplicaTermosMatriz(snl->F, x, snl->n, termosIndependentes);
+      for(int j = 0; j < tamanho; j++){
+        tempJacobiana[i][j] = aplicaFuncao(snl->Jacobiana[i][j], x, tamanho, snl->nomes_variaveis);
+        tempJacobiana[i+1][j] = aplicaFuncao(snl->Jacobiana[i+1][j], x, tamanho, snl->nomes_variaveis);
+        tempJacobiana[i+2][j] = aplicaFuncao(snl->Jacobiana[i+2][j], x, tamanho, snl->nomes_variaveis);
+        tempJacobiana[i+3][j] = aplicaFuncao(snl->Jacobiana[i+3][j], x, tamanho, snl->nomes_variaveis);
+      }
+
+      adicionaTempoJacobiana((timestamp() - tempoJacobiana), dadosExec);
+      LIKWID_MARKER_STOP("CalculaJacobiana");
+
+      //Aplica termos matriz
+      termosIndependentes[i] = aplicaFuncao(snl->F[i], x, tamanho, snl->nomes_variaveis) * -1;
+      termosIndependentes[i+1] = aplicaFuncao(snl->F[i+1], x, tamanho, snl->nomes_variaveis) * -1;
+      termosIndependentes[i+2] = aplicaFuncao(snl->F[i+2], x, tamanho, snl->nomes_variaveis) * -1;
+      termosIndependentes[i+3] = aplicaFuncao(snl->F[i+3], x, tamanho, snl->nomes_variaveis) * -1;
+    }
+
+    for(int i = tamanho - (tamanho%UNROLL_SIZE); i < tamanho; i++){
+      // Aplica termos jacobiana
+      LIKWID_MARKER_START("CalculaJacobiana");
+      tempoJacobiana = timestamp();
+      for(int j = 0; j < tamanho; j++){
+        tempJacobiana[i][j] = aplicaFuncao(snl->Jacobiana[i][j], x, tamanho, snl->nomes_variaveis);
+      }
+      adicionaTempoJacobiana((timestamp() - tempoJacobiana), dadosExec);
+      LIKWID_MARKER_STOP("CalculaJacobiana");
+
+      //Aplica termos matriz
+      termosIndependentes[i] = aplicaFuncao(snl->F[i], x, tamanho, snl->nomes_variaveis) * -1;
+    }
 
     // Verifica critério de parada termos independentes
     if(getMaiorAbs(termosIndependentes, snl->n) < snl->epsilon){
@@ -199,7 +192,7 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
     LIKWID_MARKER_STOP("MetodoNewton");
     // Imprime resultado parcial encontrado na iteracao anterior    
     adicionaTempoTotal((timestamp() - tempoTotal), dadosExec);
-    imprimeResultado(x, variaveis, tamanho, saida);
+    imprimeResultado(x, snl->nomes_variaveis, tamanho, saida);
     tempoTotal = timestamp();
     LIKWID_MARKER_START("MetodoNewton");
 
@@ -227,16 +220,12 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
   LIKWID_MARKER_STOP("MetodoNewton");
   adicionaTempoTotal((timestamp() - tempoTotal), dadosExec);
 
-  imprimeResultado(x, variaveis, tamanho, saida);
+  imprimeResultado(x, snl->nomes_variaveis, tamanho, saida);
 
   // Desalocação de espaço na memória
   destroiVetor(x);
   destroiVetor(termosIndependentes);
   destroiMatriz(tempJacobiana, snl->n);
-  for (int i = 0; i < snl->n; i++){
-    free(variaveis[i]);
-  }
-  free(variaveis);
 
   return dadosExec;
 }
@@ -269,6 +258,7 @@ void adicionaTempoDerivadas(double tempo, DadosExecucao *dados){
   
   dados->tempoDerivadas += tempo;
 }
+
 
 void adicionaTempoSistemaLinear(double tempo, DadosExecucao *dados){
   if(dados == NULL || dados->tempoSistemaLinear < 0){
