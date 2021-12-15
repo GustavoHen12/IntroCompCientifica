@@ -9,6 +9,33 @@
 
 #include "dados.h"
 
+// char **iniciaMatriz(int linhas, int colunas, int size){
+//   char **mat = malloc (linhas * size);
+//   if(mat == NULL){
+//     fprintf(stderr, "Ocorreu um erro ao criar a matriz\n");
+//     return NULL;
+//   }
+// 
+//   mat[0] = malloc(linhas * colunas * size);
+//   for (int i = 1; i < linhas; i++)
+//     mat[i] = &(mat[i-1][i * colunas]);
+// 
+//   return mat;
+// }
+
+void **iniciaMatriz(int linhas, int colunas, int size){
+  void **mat = malloc (linhas * size);
+  if(mat == NULL){
+    fprintf(stderr, "Ocorreu um erro ao criar a matriz\n");
+    return NULL;
+  }
+
+  for (int i = 0; i < linhas; i++)
+    mat[i] = malloc (colunas * size);
+
+  return mat;
+}
+
 char *recebeNomeArquivoSaida (int argc, char *argv[]) {
   char *filename = malloc(sizeof(char) * STRING_SIZE);
   // Lê possível arquivo de saída
@@ -45,14 +72,17 @@ void novoSnl(SNL *snl, int tamanho) {
   
   // Aloca matriz para jacobiana
   // cada elemento da matriz corresponde a uma função (derivada parcial) 
-  snl->Jacobiana = malloc(sizeof(void **) * tamanho);
-  if(!snl->Jacobiana)
-    fprintf(stderr, "erro ao alocar j\n");
-  for (int i = 0; i < tamanho; i++) {
-    snl->Jacobiana[i] = malloc(sizeof(void *) * tamanho);
-    if(!snl->Jacobiana[i])
-      fprintf(stderr, "erro ao alocar J[%d]\n", i);
-  }
+  // essa sera uma matriz tridiagonal
+  // snl->Jacobiana = malloc(sizeof(void **) * 3);
+  // if(!snl->Jacobiana)
+  //   fprintf(stderr, "erro ao alocar j\n");
+  // snl->Jacobiana[0] = malloc(sizeof(void *) * tamanho * 3);
+  // if(!snl->Jacobiana[0])
+  //   fprintf(stderr, "erro ao alocar j\n");
+  // for (int i = 1; i < 3; i++){
+  //   snl->Jacobiana[i] = &(snl->Jacobiana[i-1][i * tamanho]);
+  // }
+  snl->Jacobiana = iniciaMatriz(tamanho, 3, sizeof(void *));
 
   // Aloca vetor para aproximação inicial
   snl->aprox_inicial = malloc(sizeof(double) * tamanho);
@@ -72,45 +102,22 @@ FILE *abreEntrada(int argc, char *argv[]){
 // calcula a derivada parcial para cáculo da matriz jacobiana
 void calculaJacobiana(SNL *snl) {
   int tamanho = snl->n;
-  int m = 4;
-
-  // Faz o loop Unroll & Jam
-  for (int i = 0; i < tamanho - (tamanho%m); i+=m) {
-    //Salvar função para derivar
-    void *funcAtual_1 = snl->F[i]; 
-    void *funcAtual_2 = snl->F[i+1];
-    void *funcAtual_3 = snl->F[i+2];
-    void *funcAtual_4 = snl->F[i+3];
-    
-    for (int j = 0; j < tamanho; j++) {
-      snl->Jacobiana[i][j] = evaluator_derivative(funcAtual_1, snl->nomes_variaveis[j]);
-      snl->Jacobiana[i+1][j] = evaluator_derivative(funcAtual_2, snl->nomes_variaveis[j]);
-      snl->Jacobiana[i+2][j] = evaluator_derivative(funcAtual_3, snl->nomes_variaveis[j]);
-      snl->Jacobiana[i+3][j] = evaluator_derivative(funcAtual_4, snl->nomes_variaveis[j]);
-    }
+  snl->Jacobiana[0][0] = 0;
+  snl->Jacobiana[1][0] = evaluator_derivative(snl->F[0], snl->nomes_variaveis[0]);
+  snl->Jacobiana[2][0] = evaluator_derivative(snl->F[0], snl->nomes_variaveis[1]);
+  for (int i = 1; i < tamanho-1; i++){
+    void *funcAtual = snl->F[i]; 
+    snl->Jacobiana[0][i]= evaluator_derivative(funcAtual, snl->nomes_variaveis[i-1]);
+    snl->Jacobiana[1][i]= evaluator_derivative(funcAtual, snl->nomes_variaveis[i  ]);
+    snl->Jacobiana[2][i]= evaluator_derivative(funcAtual, snl->nomes_variaveis[i+1]);
   }
-
-  for (int i = tamanho - (tamanho%m); i < tamanho; i++) {
-    void *funcAtual = snl->F[i]; //Salvar função para derivar
-    for (int j = 0; j < tamanho; j++) {
-      snl->Jacobiana[i][j] = evaluator_derivative(funcAtual, snl->nomes_variaveis[j]);
-    }
-  }
+  snl->Jacobiana[0][tamanho - 1] = evaluator_derivative(snl->F[tamanho - 1], snl->nomes_variaveis[tamanho - 2]);
+  snl->Jacobiana[1][tamanho - 1] = evaluator_derivative(snl->F[tamanho - 1], snl->nomes_variaveis[tamanho - 1]);
+  snl->Jacobiana[2][tamanho - 1] = 0;
+  
 }
 
-void **iniciaMatriz(int linhas, int colunas, int size){
-  void **mat = malloc (linhas * size);
-  if(mat == NULL){
-    fprintf(stderr, "Ocorreu um erro ao criar a matriz\n");
-    return NULL;
-  }
-
-  for (int i = 0; i < linhas; i++)
-    mat[i] = malloc (colunas * size);
-
-  return mat;
-}
-
+ 
 double iniciaSnlEntrada(SNL *snl) {
   int tamanho = snl->n;
 
@@ -130,31 +137,31 @@ double iniciaSnlEntrada(SNL *snl) {
       fprintf(stderr, "Ocorreu um erro ao realizar a leitura da entrada\n");
     }
   }
-
-  // Epsilon
-  if(scanf("%le", &snl->epsilon) != 1){
-    fprintf(stderr, "Ocorreu um erro ao realizar a leitura da entrada\n");
-  }
-
-  // Maximo de iterações
-  if(scanf("%d", &snl->max_iter) != 1){
-    fprintf(stderr, "Ocorreu um erro ao realizar a leitura da entrada\n");
-  }
-  getchar();
-
-  // Inicia nomes das variaveis
-  snl->nomes_variaveis = (char **) iniciaMatriz(tamanho, VARIABLE_NAME_SIZE, sizeof(char *));
-  for (int i = 0; i < tamanho; i++){
-    sprintf(snl->nomes_variaveis[i], "x%d", i+1);
-  }
-
-  double tempoDerivadas;
-  tempoDerivadas = timestamp();
-  LIKWID_MARKER_START("GeracaoJacobiana");
-  calculaJacobiana(snl);
-  LIKWID_MARKER_STOP("GeracaoJacobiana");
-  tempoDerivadas = timestamp() - tempoDerivadas;
-
+ 
+   // Epsilon
+   if(scanf("%le", &snl->epsilon) != 1){
+     fprintf(stderr, "Ocorreu um erro ao realizar a leitura da entrada\n");
+   }
+ 
+   // Maximo de iterações
+   if(scanf("%d", &snl->max_iter) != 1){
+     fprintf(stderr, "Ocorreu um erro ao realizar a leitura da entrada\n");
+   }
+   getchar();
+ 
+   // Inicia nomes das variaveis
+   snl->nomes_variaveis = (char **) iniciaMatriz(tamanho, VARIABLE_NAME_SIZE, sizeof(char *));
+   for (int i = 0; i < tamanho; i++){
+     sprintf(snl->nomes_variaveis[i], "x%d", i+1);
+   }
+ 
+   double tempoDerivadas;
+   tempoDerivadas = timestamp();
+   LIKWID_MARKER_START("GeracaoJacobiana");
+   calculaJacobiana(snl);
+   LIKWID_MARKER_STOP("GeracaoJacobiana");
+   tempoDerivadas = timestamp() - tempoDerivadas;
+ 
   return tempoDerivadas;
 }
 
@@ -162,22 +169,19 @@ void encerraSNL(SNL *snl) {
   int tamanho = snl->n;
 
   // Destroi funções e libera matriz do SNL 
-  for (int i = 0; i < tamanho; i++) {
-    evaluator_destroy (snl->F[i]);
-  }
-  free(snl->F);
+  // for (int i = 0; i < tamanho; i++) {
+  //   evaluator_destroy (snl->F[i]);
+  // }
+  // free(snl->F);
 
-  // Libera aproximação inicial
-  free(snl->aprox_inicial);
+  // // Libera aproximação inicial
+  // free(snl->aprox_inicial);
 
-  // Destroi e libera matriz jacobiana
-  for(int i = 0; i < tamanho; i++){
-    for(int j = 0; j < tamanho; j++){
-      evaluator_destroy (snl->Jacobiana[i][j]);
-    }
-    free(snl->Jacobiana[i]);
-  }
-  free(snl->Jacobiana);
+  // // Destroi e libera matriz jacobiana
+  // free(snl->Jacobiana[0]);
+  // snl->Jacobiana[1] = NULL;
+  // snl->Jacobiana[2] = NULL;
+  // free(snl->Jacobiana);
 
   // Libera variaveis
   snl->epsilon = 0;

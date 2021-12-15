@@ -3,7 +3,7 @@ DIRINICIAL=$PWD # diretorio de onde foi rodado o programa
 
 [[ $# -ne 2 ]] && echo "Forma de usar: $0 <pasta com código fonte e makefile> <pasta para saída>" && exit
 
-TAMANHOS_TESTE=( 10 32 50 64 ) #100 128 200 250 256 300 400 512 600 1000 1024 2000 2048 3000 4096)
+TAMANHOS_TESTE=( 10 32 50 64 100 128 200 250 256 300 400 512 600 1000 1024 2000 2048 3000 4096)
 echo "performance" > /sys/devices/system/cpu/cpufreq/policy3/scaling_governor
 
 # Variaveis para diretorios

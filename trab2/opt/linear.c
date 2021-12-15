@@ -9,83 +9,26 @@
 
 #include "linear.h"
 
-double  *calculculaSistemaLinear(double **sistema, double *termos_independentes, int tam){
-  int *transformacoes = malloc(tam * sizeof(int));
-  for (int i = 0; i < tam; i ++)
-    transformacoes[i] = i;
+double  *calculaSistemaLinear(double **sistema, double *termos_independentes, int tam){
   // Zerar triangulo inferior
-  for(int i = 0; i < tam; i++){
-    pivoteia(sistema, termos_independentes, transformacoes, i, tam);
-    zeraAbaixo(sistema, termos_independentes, i, tam);
-  }
+  zeraDiagonal(sistema, termos_independentes, tam);
   // Criação do vetor das variáveis
   double *variaveis = malloc(tam * sizeof(double));
 
   // Cálculo das variáveis
   for(int i = tam -1; i >= 0; i--){
     double total = 0;
-    for(int j = i+1; j < tam; j++)
-      total += sistema[i][j] * variaveis[j];
-    variaveis[i] = (termos_independentes[i] - total) / sistema[i][i];
+    total += sistema[2][i] * variaveis[i + 1];
+    variaveis[i] = (termos_independentes[i] - total) / sistema[1][i];
   }
-
-  // Despivoteia o sistema inteiro para retornar as variáveis corretas
-  despivoteia(sistema, termos_independentes, transformacoes, variaveis, tam);
-  free(transformacoes);
 
   return variaveis;
 }
 
-void pivoteia(double **sistema, double *termos_independentes, int *transformacoes, int n, int tam){
-  int max = n; // Valor para salvar o índice da linha com maior enésimo elemento
-  for(int i = n; i < tam; i++)
-    if (fabs(sistema[i][n]) > fabs(sistema[max][n])) max = i;
-
-  // modifica vetor de transformacoes
-  int temp = transformacoes[max];
-  transformacoes[max] = transformacoes[n];
-  transformacoes[n] = temp;
-
-  // faz alteração necessária no sistema
-  double *tempS = sistema[max];
-  sistema[max] = sistema[n];
-  sistema[n] = tempS;
-
-  // faz alteração necessária nos termos independentes
-  double tempI = termos_independentes[max];
-  termos_independentes[max] = termos_independentes[n];
-  termos_independentes[n] = tempI;
-}
-
-void despivoteia(double **sistema, double *termos_independentes, int *transformacoes, double *variaveis, int tam){
-  for(int i = 0; i < tam - 1; i++){
-    int trocar_com = transformacoes[i];
-
-    // faz alteração necessária no sistema
-    double *tempS = sistema[trocar_com];
-    sistema[trocar_com] = sistema[i];
-    sistema[i] = tempS;
-
-    // faz alteração necessária nos termos independentes
-    double tempD = termos_independentes[trocar_com];
-    termos_independentes[trocar_com] = termos_independentes[i];
-    termos_independentes[i] = tempD;
-
-    // modifica vetor de transformacoes
-    int temp = transformacoes[trocar_com];
-    transformacoes[trocar_com] = transformacoes[i];
-    transformacoes[i] = temp;
-
-  }
-}
-
-void zeraAbaixo(double **sistema, double *termos_independentes, int n, int tam){
-  for(int i = n+1; i < tam; i++){
-    double m = -(sistema[i][n] / sistema[n][n]);
-    sistema[i][n] = 0;
-    for(int j = n + 1; j < tam; j++){
-      sistema[i][j] += m * sistema[n][j];
-    }
-    termos_independentes[i] += m * termos_independentes[n];
+void zeraDiagonal(double **sistema, double *termos_independentes, int tam){
+  for(int i = 0; i < tam; i++){
+    double m = sistema[0][i+1] / sistema[1][i];
+    sistema[0][i+1] = 0;
+    sistema[1][i+1] -= sistema[2][i] * m;
   }
 }
