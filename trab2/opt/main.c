@@ -20,9 +20,6 @@ int main(int argc, char *argv[]){
     // Como as derivadas parciais não fazem parte do cáculo do sistema,
     // mas sim da leitura da entrada este é armazenado para ser impresso posteriormente.
     double tempoDerivadas = iniciaSnlEntrada(&snl);
-    for (int i = 0; i < snl.n; i++){
-      printf("x%d = %0.6f\n", i, snl.aprox_inicial[i]);
-    }
     
     // Calcula o valor do sistema não linear
     DadosExecucao *dadosExecucao = calculaSNL(&snl, arqOut);

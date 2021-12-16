@@ -87,7 +87,6 @@ void novoSnl(SNL *snl, int tamanho) {
   snl->Jacobiana[0] = (void **)malloc(3 * tamanho * sizeof(void *));
   snl->Jacobiana[1] = snl->Jacobiana[0] + tamanho;
   snl->Jacobiana[2] = snl->Jacobiana[0] + tamanho*2;
-  printf("[%p]\n[%p]\n[%p]\n", snl->Jacobiana[0], snl->Jacobiana[1], snl->Jacobiana[2]);
 
   // Aloca vetor para aproximação inicial
   snl->aprox_inicial = malloc(sizeof(double) * tamanho);
@@ -107,7 +106,7 @@ FILE *abreEntrada(int argc, char *argv[]){
 // calcula a derivada parcial para cáculo da matriz jacobiana
 void calculaJacobiana(SNL *snl) {
   int tamanho = snl->n;
-  snl->Jacobiana[0][0] = evaluator_derivative(snl->F[0], "b");
+  snl->Jacobiana[0][0] = evaluator_derivative(snl->F[0], "b"); // usado para criar uma função nula
   snl->Jacobiana[1][0] = evaluator_derivative(snl->F[0], snl->nomes_variaveis[0]);
   snl->Jacobiana[2][0] = evaluator_derivative(snl->F[0], snl->nomes_variaveis[1]);
   for (int i = 1; i < tamanho-1; i++){
@@ -118,11 +117,8 @@ void calculaJacobiana(SNL *snl) {
   }
   snl->Jacobiana[0][tamanho - 1] = evaluator_derivative(snl->F[tamanho - 1], snl->nomes_variaveis[tamanho - 2]);
   snl->Jacobiana[1][tamanho - 1] = evaluator_derivative(snl->F[tamanho - 1], snl->nomes_variaveis[tamanho - 1]);
-  snl->Jacobiana[2][tamanho - 1] = snl->Jacobiana[0][0];
-
-  for (int i = 0; i < tamanho; i++){
-    printf("[%s] [%s] [%s]\n", evaluator_get_string(snl->Jacobiana[0][i]), evaluator_get_string(snl->Jacobiana[1][i]), evaluator_get_string(snl->Jacobiana[2][i]));
-  }
+  snl->Jacobiana[2][tamanho - 1] = snl->Jacobiana[0][0]; // usado para usar uma função nula já gerada
+  
 }
 
  

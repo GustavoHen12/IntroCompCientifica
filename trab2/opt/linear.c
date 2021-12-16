@@ -12,21 +12,7 @@
 
 double  *calculaSistemaLinear(double **sistema, double *termos_independentes, int tam){
   // Zerar triangulo inferior
-  printf("sistema antes de zera diagonais\n");
-  for (int j = 0; j < tam; j++){
-    for (int i = 0; i < 3; i++){
-      printf("[%0.6f] ", sistema[i][j]);
-    }
-    printf("\n");
-  }
   zeraDiagonal(sistema, termos_independentes, tam);
-  printf("sistema depois de zera diagonais\n");
-  for (int j = 0; j < tam; j++){
-    for (int i = 0; i < 3; i++){
-      printf("[%0.6f] ", sistema[i][j]);
-    }
-    printf("\n");
-  }
   // Criação do vetor das variáveis
   double *variaveis = malloc(tam * sizeof(double));
 
@@ -37,12 +23,6 @@ double  *calculaSistemaLinear(double **sistema, double *termos_independentes, in
     total += sistema[2][i] * variaveis[i + 1];
     variaveis[i] = (termos_independentes[i] - total) / sistema[1][i];
   }
-  printf("Variaveis:\n");
-  for (int i = 0; i < tam; i++)
-    printf("[%0.6f] ", variaveis[i]);
-  printf("\ntermos_independentes:\n");
-  for (int i = 0; i < tam; i++)
-    printf("[%0.6f] ", termos_independentes[i]);
 
   return variaveis;
 }

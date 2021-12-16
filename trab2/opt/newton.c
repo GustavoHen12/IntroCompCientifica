@@ -125,7 +125,10 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
 
   // Inicia variaveis utilizadas para calculo
   double *x = criaVetor(snl->n);
-  double **tempJacobiana = criaMatriz(3, snl->n);
+  double **tempJacobiana = (double **)malloc(3 * sizeof(double *));
+  tempJacobiana[0] = (double *)malloc(3 * snl->n * sizeof(double));
+  tempJacobiana[1] = tempJacobiana[0] + snl->n;
+  tempJacobiana[2] = tempJacobiana[0] + snl->n*2;
   double *termosIndependentes = criaVetor(snl->n);
   if(x == NULL || tempJacobiana == NULL || termosIndependentes == NULL){
     return NULL;
@@ -144,7 +147,6 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
 
   // Copia vetor da aproximação inicial para o com o valor de X
   copiaVetor(snl->aprox_inicial, x, snl->n);
-  imprimeResultado(snl->aprox_inicial, snl->nomes_variaveis, tamanho, saida);
 
   int iteracao = 0;
   LIKWID_MARKER_START("MetodoNewton");
