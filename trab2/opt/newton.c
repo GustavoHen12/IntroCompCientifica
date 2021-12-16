@@ -127,7 +127,6 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
   double *x = criaVetor(snl->n);
   double **tempJacobiana = criaMatriz(3, snl->n);
   double *termosIndependentes = criaVetor(snl->n);
-  printf("termosIndependentes = %p\n", termosIndependentes);
   if(x == NULL || tempJacobiana == NULL || termosIndependentes == NULL){
     return NULL;
   }
@@ -209,7 +208,6 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
 
   // Desalocação de espaço na memória
   destroiVetor(x);
-  printf("termosIndependentes = %p\n", termosIndependentes);
   //destroiVetor(termosIndependentes);
   //destroiMatriz(tempJacobiana, snl->n);
 
