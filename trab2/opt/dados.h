@@ -56,4 +56,12 @@ double iniciaSnlEntrada(SNL *snl);
 // Finaliza funções e desaloca dados do SNL
 void encerraSNL(SNL *snl);
 
+// Cria matriz [linhas]x[colunas] em um espaço contínuo de memória,
+// sendo que, os elementos dessa matriz possuem tamanho size.
+// Se criou corretamente retorna o ponteiro para nova matriz
+// Caso contrário retorna null
+char **iniciaMatriz(int linhas, int colunas, int size);
+
+// Libera o espaço da matriz mat, que possui tamanho LinhasxN
+void encerraMatriz(void **mat, int linhas);
 #endif

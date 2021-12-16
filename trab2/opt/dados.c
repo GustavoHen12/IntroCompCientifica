@@ -9,31 +9,30 @@
 
 #include "dados.h"
 
-// char **iniciaMatriz(int linhas, int colunas, int size){
-//   char **mat = malloc (linhas * size);
-//   if(mat == NULL){
-//     fprintf(stderr, "Ocorreu um erro ao criar a matriz\n");
-//     return NULL;
-//   }
-// 
-//   mat[0] = malloc(linhas * colunas * size);
-//   for (int i = 1; i < linhas; i++)
-//     mat[i] = &(mat[i-1][i * colunas]);
-// 
-//   return mat;
-// }
-
-void **iniciaMatriz(int linhas, int colunas, int size){
-  void **mat = malloc (linhas * size);
+char **iniciaMatriz(int linhas, int colunas, int size){
+  char **mat = malloc (linhas * size);
   if(mat == NULL){
     fprintf(stderr, "Ocorreu um erro ao criar a matriz\n");
     return NULL;
   }
 
-  for (int i = 0; i < linhas; i++)
-    mat[i] = malloc (colunas * size);
+  mat[0] = malloc(linhas * colunas * size);
+  for (int i = 1; i < linhas; i++)
+    mat[i] = mat[0] + (colunas * i);
 
   return mat;
+}
+
+void encerraMatriz(void **mat, int linhas){
+  if(mat == NULL){
+    fprintf(stderr, "Matriz inválida, não é possível encerrar\n");
+    return;
+  }
+
+  free(mat[0]);
+  for (int i = 1; i < linhas; i++)
+    mat[i] = NULL;
+  free(mat);
 }
 
 char *recebeNomeArquivoSaida (int argc, char *argv[]) {
@@ -178,8 +177,7 @@ void encerraSNL(SNL *snl) {
   free(snl->Jacobiana);
 
   // Libera nome das variaveis
-  for (int i=0; i < snl->n; i++)
-    free(snl->nomes_variaveis[i]);
+  encerraMatriz((void **) snl->nomes_variaveis, tamanho);
 
   // Libera variaveis
   snl->epsilon = 0;

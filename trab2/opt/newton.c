@@ -66,31 +66,6 @@ void destroiVetor(double *vet){
   free(vet);
 }
 
-// Cria matriz de "colunas" x "linhas"
-// Se ocorrer algum erro, retorna NULL
-double **criaMatriz(int colunas, int linhas){
-
-  double **mat = malloc(sizeof(void **) * colunas);
-  if(!mat)
-    fprintf(stderr, "erro ao alocar j\n");
-  mat[0] = malloc(sizeof(void *) * linhas * colunas);
-  if(!mat[0])
-    fprintf(stderr, "erro ao alocar j\n");
-  for (int i = 1; i < colunas; i++){
-    mat[i] = &(mat[i-1][i * linhas]);
-  }
-
-  return mat;
-}
-
-void destroiMatriz(double **mat, int colunas){
-  free(mat[0]);
-  for (int i = 0; i < colunas; i++){
-    mat[i] = NULL;
-  }
-  free(mat);
-}
-
 // Copia um vetor A em um vetor B
 void copiaVetor(double *vetA, double *vetB, int tam){
   if(vetA != NULL && vetB != NULL){
@@ -125,10 +100,7 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
 
   // Inicia variaveis utilizadas para calculo
   double *x = criaVetor(snl->n);
-  double **tempJacobiana = (double **)malloc(3 * sizeof(double *));
-  tempJacobiana[0] = (double *)malloc(3 * snl->n * sizeof(double));
-  tempJacobiana[1] = tempJacobiana[0] + snl->n;
-  tempJacobiana[2] = tempJacobiana[0] + snl->n*2;
+  double **tempJacobiana = (double **) iniciaMatriz(3, snl->n, sizeof(double));
   double *termosIndependentes = criaVetor(snl->n);
   if(x == NULL || tempJacobiana == NULL || termosIndependentes == NULL){
     return NULL;
@@ -211,7 +183,7 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
   // Desalocação de espaço na memória
   destroiVetor(x);
   destroiVetor(termosIndependentes);
-  destroiMatriz(tempJacobiana, snl->n);
+  encerraMatriz((void **) tempJacobiana, snl->n);
 
   return dadosExec;
 }
