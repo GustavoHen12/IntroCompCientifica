@@ -73,16 +73,6 @@ void novoSnl(SNL *snl, int tamanho) {
   // Aloca matriz para jacobiana
   // cada elemento da matriz corresponde a uma função (derivada parcial) 
   // essa sera uma matriz tridiagonal
-  // snl->Jacobiana = malloc(sizeof(void **) * 3);
-  // if(!snl->Jacobiana)
-  //   fprintf(stderr, "erro ao alocar j\n");
-  // snl->Jacobiana[0] = malloc(sizeof(void *) * tamanho * 3);
-  // if(!snl->Jacobiana[0])
-  //   fprintf(stderr, "erro ao alocar j\n");
-  // for (int i = 1; i < 3; i++){
-  //   snl->Jacobiana[i] = &(snl->Jacobiana[i-1][i * tamanho]);
-  // }
-  //snl->Jacobiana = iniciaMatriz(tamanho, 3, sizeof(void *));
   snl->Jacobiana = (void ***)malloc(3 * sizeof(void **));
   snl->Jacobiana[0] = (void **)malloc(3 * tamanho * sizeof(void *));
   snl->Jacobiana[1] = snl->Jacobiana[0] + tamanho;
@@ -173,19 +163,23 @@ void encerraSNL(SNL *snl) {
   int tamanho = snl->n;
 
   // Destroi funções e libera matriz do SNL 
-  // for (int i = 0; i < tamanho; i++) {
-  //   evaluator_destroy (snl->F[i]);
-  // }
-  // free(snl->F);
+  for (int i = 0; i < tamanho; i++) {
+    evaluator_destroy (snl->F[i]);
+  }
+  free(snl->F);
 
-  // // Libera aproximação inicial
-  // free(snl->aprox_inicial);
+  // Libera aproximação inicial
+  free(snl->aprox_inicial);
 
-  // // Destroi e libera matriz jacobiana
-  // free(snl->Jacobiana[0]);
-  // snl->Jacobiana[1] = NULL;
-  // snl->Jacobiana[2] = NULL;
-  // free(snl->Jacobiana);
+  // Destroi e libera matriz jacobiana
+  free(snl->Jacobiana[0]);
+  snl->Jacobiana[1] = NULL;
+  snl->Jacobiana[2] = NULL;
+  free(snl->Jacobiana);
+
+  // Libera nome das variaveis
+  for (int i=0; i < snl->n; i++)
+    free(snl->nomes_variaveis[i]);
 
   // Libera variaveis
   snl->epsilon = 0;

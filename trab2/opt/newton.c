@@ -210,8 +210,8 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
 
   // Desalocação de espaço na memória
   destroiVetor(x);
-  //destroiVetor(termosIndependentes);
-  //destroiMatriz(tempJacobiana, snl->n);
+  destroiVetor(termosIndependentes);
+  destroiMatriz(tempJacobiana, snl->n);
 
   return dadosExec;
 }
