@@ -100,7 +100,12 @@ DadosExecucao *calculaSNL(SNL *snl, FILE *saida){
 
   // Inicia variaveis utilizadas para calculo
   double *x = criaVetor(snl->n);
-  double **tempJacobiana = (double **) iniciaMatriz(3, snl->n, sizeof(double));
+
+  double **tempJacobiana = (double **)malloc(3 * sizeof(double *));
+  tempJacobiana[0] = (double *)malloc(3 * snl->n * sizeof(double));
+  tempJacobiana[1] = tempJacobiana[0] + snl->n;
+  tempJacobiana[2] = tempJacobiana[0] + snl->n*2;
+  
   double *termosIndependentes = criaVetor(snl->n);
   if(x == NULL || tempJacobiana == NULL || termosIndependentes == NULL){
     return NULL;
