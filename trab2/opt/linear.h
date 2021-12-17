@@ -1,5 +1,5 @@
 /************
-* CI1164-Trabalho 1
+* CI1164-Trabalho 2
 *
 * Autores:
 *   Iago Mello Floriano - GRR:20196049 - imf19@inf.ufpr.br
