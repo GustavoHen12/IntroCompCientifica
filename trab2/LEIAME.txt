@@ -1,0 +1,17 @@
+Instruções de compilação:
+  Para os dois programas foi feito uma makefile para que a compilação com a biblioteca likwid seja feita apenas com o comando "make"
+Execução de scripts:
+  O script geraDados.sh foi feito para ser usado da seguinte forma (considerando que o usuário a rodar tem permissão para modificar sys/devices/system/cpu/cpufreq/policy3/scaling_governor):
+  sudo ./geraDados.sh <pasta com arquivos fonte> <pasta de saida>
+  O script roda o programa e gera as saídas possível do programa likwid. Esse script roda para entradas de tamanhos {10, 32, 50, 64, 100, 128, 200, 250, 256, 300, 400, 512, 600, 1000, 1024, 2000, 2048, 3000, 4096}
+  para gerar os dado para cada versão foi executado o script da seguinte forma:
+  sudo ./geraDados.sh ./opt saida
+  sudo ./geraDados.sh ./naoOpt saida
+
+  O script geraCSV.sh utiliza a saída de geraDados.sh para gerar 4 arquivos CSV, um para cada parâmetro testado por likwik-perfctr e um para a saída de tempo do programa.
+  Esse script compara 2 programas que foram testados por geraDados.sh
+
+  O script geraGraficos.gp utilizada as entradas da pasta ./csv para gerar 16 gráficos e salvalos na pasta passada como parâmetro.
+  Ex: ./geraGraficos.gp graficos
+
+O código do trabalho 1 teve modificações feitas apenas para fazer uso da biblioteca likwid e para a contagem de tempo não contar o tempo de impressão da saída.
