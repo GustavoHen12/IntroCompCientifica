@@ -13,13 +13,12 @@ SRC=$1                            # pasta para diretorio do codigo
 SAIDAS=$2/$(basename $1)          # pasta onde terão todas as saidas
 OUTLIKWID=$SAIDAS/likwid          # pasta para os resultados obtidos com likwid
 OUTSRC=$SAIDAS/$1                 # pasta para a saída do programa
-OUTCSV=$SAIDAS/csv                # pasta para salvar os csvs para serem usados por graficos.gp
 ENTRADAS=$THISDIR/entradas        # pasta para as saídas de ./broyden.sh
 
 cd $THISDIR
 
 # Criação das pastas onde serão salvos os resultados
-mkdir -p $SAIDAS $OUTLIKWID $OUTSRC $OUTCSV $ENTRADAS
+mkdir -p $SAIDAS $OUTLIKWID $OUTSRC $ENTRADAS
 
 # Geração dos sistemas, cada sistema em um arquivo para ser mais fácil separar os testes por tamanho
 cd $ENTRADAS
