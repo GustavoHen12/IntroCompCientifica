@@ -1,6 +1,7 @@
 #!/usr/bin/gnuplot -persist
 SAIDAS_CSV = GPVAL_PWD."/csv"
 GRAFICOS = GPVAL_PWD."/graficos"
+system "mkdir -p " . GRAFICOS
 
 # L3
 set terminal png size 800,500 enhanced
@@ -42,7 +43,7 @@ plot SAIDAS_CSV."/L3.csv" u 1:5 w lines smooth unique title 'opt', \
 set terminal png size 800,500 enhanced
 set output GRAFICOS.'/GERACAOJACOBIANA_L2CACHE.png'
 set xlabel "Tamanho"
-set ylabel "MBytes/s"
+set ylabel "Falhas/Tentaivas"
 set title "Data cache miss ratio - Geração Jacobiana"
 plot SAIDAS_CSV."/L2CACHE.csv" u 1:2 w lines smooth unique title 'opt', \
     SAIDAS_CSV."/L2CACHE.csv" u 1:6 w lines smooth unique title 'naoOpt'
@@ -50,7 +51,7 @@ plot SAIDAS_CSV."/L2CACHE.csv" u 1:2 w lines smooth unique title 'opt', \
 set terminal png size 800,500 enhanced
 set output GRAFICOS.'/METODONEWTON_L2CACHE.png'
 set xlabel "Tamanho"
-set ylabel "MBytes/s"
+set ylabel "Falhas/Tentaivas"
 set title "Data cache miss ratio -  Método Newton"
 plot SAIDAS_CSV."/L2CACHE.csv" u 1:3 w lines smooth unique title 'opt', \
     SAIDAS_CSV."/L2CACHE.csv" u 1:7 w lines smooth unique title 'naoOpt'
@@ -58,7 +59,7 @@ plot SAIDAS_CSV."/L2CACHE.csv" u 1:3 w lines smooth unique title 'opt', \
 set terminal png size 800,500 enhanced
 set output GRAFICOS.'/CALCULAJACOBIANA_L2CACHE.png'
 set xlabel "Tamanho"
-set ylabel "MBytes/s"
+set ylabel "Falhas/Tentaivas"
 set title "Data cache miss ratio - Calculo da Jacobiana "
 plot SAIDAS_CSV."/L2CACHE.csv" u 1:4 w lines smooth unique title 'opt', \
     SAIDAS_CSV."/L2CACHE.csv" u 1:8 w lines smooth unique title 'naoOpt'
@@ -66,7 +67,7 @@ plot SAIDAS_CSV."/L2CACHE.csv" u 1:4 w lines smooth unique title 'opt', \
 set terminal png size 800,500 enhanced
 set output GRAFICOS.'/SISTEMALINEAR_L2CACHE.png'
 set xlabel "Tamanho"
-set ylabel "MBytes/s"
+set ylabel "Falhas/Tentaivas"
 set title "Data cache miss ratio - Calculo Sistema Linear"
 plot SAIDAS_CSV."/L2CACHE.csv" u 1:5 w lines smooth unique title 'opt', \
     SAIDAS_CSV."/L2CACHE.csv" u 1:9 w lines smooth unique title 'naoOpt'
